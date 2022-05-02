@@ -98,7 +98,7 @@ class Audit(commands.Cog):
             r"(?:https?://)?(?:www\.)?(?:discord\.(?:gg|io|me|li)|(?:discordapp|discord)\.com/invite)/[\w]+"
         )
         self.whname = "Quality Line Support Audit Logger"
-        self.acname = "📜server-logs"
+        self.acname = "bot-logs-and-moderation"
         self._webhooks = {}
         self._webhook_locks = {}
 
