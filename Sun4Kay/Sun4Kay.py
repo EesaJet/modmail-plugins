@@ -9,7 +9,7 @@ class Kay(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         if "Kay" in message.content.upper():
-            await message.add_reaction("KAY")
+            await message.add_reaction("APPLE")
 
 
 
