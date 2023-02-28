@@ -15,4 +15,4 @@ class Shit(commands.Cog):
 
 
 async def setup(bot):
-    await bot.add_cog(Banana(bot))
+    await bot.add_cog(Shit(bot))
