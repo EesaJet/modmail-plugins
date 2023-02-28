@@ -1,6 +1,6 @@
 from discord.ext import commands
 
-class Jay(commands.Cog):
+class Simple(commands.Cog):
     """Reacts with a banana emoji if someone says banana."""
 
     def __init__(self, bot):
@@ -12,4 +12,4 @@ class Jay(commands.Cog):
             await message.add_reaction("OLDMAN:1080264190062768289")
 
 async def setup(bot):
-    await bot.add_cog(Jay(bot))
+    await bot.add_cog(Simple(bot))
