@@ -9,7 +9,7 @@ class Apple(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         if "APPLE" in message.content.upper():
-            await message.add_reaction("APPLE")
+            await message.add_reaction("\N{APPLE}")
 
 
 async def setup(bot):
