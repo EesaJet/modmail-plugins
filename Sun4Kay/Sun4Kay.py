@@ -9,7 +9,7 @@ class Kay(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         if "KAY" in message.content.upper():
-            await message.add_reaction("KAY:890012337912811601")
+            await message.add_reaction("KAYA:813843744385269762")
 
 
 
