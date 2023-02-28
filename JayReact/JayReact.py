@@ -9,7 +9,7 @@ class Jay(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         if "JAY" in message.content.upper():
-            await message.add_reaction("{OLDER_ADULT}")
+            await message.add_reaction("OLDMAN:1080268375911059517")
 
 async def setup(bot):
     await bot.add_cog(Jay(bot))
