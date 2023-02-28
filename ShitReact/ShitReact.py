@@ -9,10 +9,7 @@ class Shit(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         if "SHIT" in message.content.upper():
-            await message.add_reaction("\N{POO}")
-
-
-
+            await message.add_reaction("\N{BANANA}")
 
 async def setup(bot):
     await bot.add_cog(Shit(bot))
