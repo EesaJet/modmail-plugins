@@ -1,6 +1,6 @@
 from discord.ext import commands
 
-class Kay(commands.Cog):
+class Banana(commands.Cog):
     """Reacts with a banana emoji if someone says banana."""
 
     def __init__(self, bot):
@@ -8,11 +8,11 @@ class Kay(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if "Kay" in message.content.upper():
+        if "Banana" in message.content.upper():
             await message.add_reaction("\N{BANANA}")
 
 
 
 
 async def setup(bot):
-    await bot.add_cog(Kay(bot))
+    await bot.add_cog(Banana(bot))
