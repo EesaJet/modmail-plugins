@@ -370,6 +370,34 @@ class ModerationLogging:
             description=f"`{member}` has been kicked.",
         )
 
+    async def on_message_delete(self, message: discord.Message) -> None:
+      
+        config = self.cog.guild_config(str(message.guild.id))
+        if not config.get("logging"):
+            return
+
+        audit_logs = message.guild.audit_logs(limit=10, action=discord.AuditLogAction.message_delete)
+        async for entry in audit_logs:
+            if int(entry.target.id) == message.id:
+                break
+        else:
+            return
+          
+        mod = entry.user
+        if mod == self.bot.user:
+            return
+      
+        if entry.created_at.timestamp() < message.created_at.timestamp():
+            return
+
+        await self.send_log(
+            member.guild,
+            action="message delete",
+            target=f"Message Autor: `{message.author}`",
+            moderator=f"Deleted by `{mod}`",
+            message={message.content},
+        )
+
     async def on_member_join(self, member: discord.Member) -> None:
 
         config = self.cog.guild_config(str(member.guild.id))
