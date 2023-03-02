@@ -18,6 +18,7 @@ logger = getLogger(__name__)
 action_colors = {
     "normal": discord.Color.blue(),
     "ban": discord.Color.red(),
+    "join": discord.Color.green(),
     "multiban": discord.Color.red(),
     "mute": discord.Color.dark_grey(),
 }
