@@ -318,8 +318,6 @@ class ModerationLogging:
               if found:
                   return
                 
-      if before.author.bot:
-          return  # ignore messages edited by bots
 
       if before.content == after.content:
             return  # ignore if the message content hasn't changed
