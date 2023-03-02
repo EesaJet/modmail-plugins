@@ -342,15 +342,11 @@ class ModerationLogging:
         if not config.get("logging"):
             return
 
-        audit_logs = member.guild.audit_logs(limit=10, action=discord.AuditLogAction.join)
+        audit_logs = member.guild.audit_logs(limit=10, action=discord.AuditLogAction.bot_add)
         async for entry in audit_logs:
             if int(entry.target.id) == member.id:
                 break
         else:
-            return
-
-        mod = entry.user
-        if mod == self.bot.user:
             return
 
         if entry.created_at.timestamp() < member.joined_at.timestamp():
