@@ -1505,6 +1505,10 @@ class Moderation(commands.Cog):
     @commands.Cog.listener()
     async def on_member_remove(self, *args, **kwargs) -> None:
         await self.logging.on_member_remove(*args, **kwargs)
+        
+    @commands.Cog.listener()
+    async def on_member_join(self, *args, **kwargs) -> None:
+        await self.logging.on_member_join(*args, **kwargs)
 
     @commands.Cog.listener()
     async def on_member_ban(self, *args, **kwargs) -> None:
