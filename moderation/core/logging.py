@@ -20,6 +20,7 @@ action_colors = {
     "ban": discord.Color.red(),
     "member joined": discord.Color.green(),
     "member left": discord.Color.red(),
+    "message edited": discord.Color.red(),
     "multiban": discord.Color.red(),
     "mute": discord.Color.dark_grey(),
 }
@@ -262,6 +263,34 @@ class ModerationLogging:
             reason=reason if reason else "None",
             description=description,
             **kwargs,
+        )
+        
+    async def _on_message_edit(
+        self,
+        before: discord.Message,
+        after: discord.Message,
+        moderator: discord.Member
+    ) -> None:
+        if before.author.bot:
+            return  # ignore messages edited by bots
+
+        if before.content == after.content:
+            return  # ignore if the message content hasn't changed
+        guild = before.guild
+        author = before.author
+        channel = before.channel
+        description = f"Message edited by {author.mention} in {channel.mention}"
+        fields = {
+        "Before": before.content,
+        "After": after.content,
+        }
+  
+        await self.send_log(
+            guild,
+            action="message edited",
+            target=after,
+            description=description,
+            fields=fields,
         )
 
     async def _on_member_timed_out_update(
