@@ -265,7 +265,7 @@ class ModerationLogging:
             **kwargs,
         )
         
-    async def _on_message_edit(
+    async def on_message_edit(
         
         self,
         before: discord.Message,
