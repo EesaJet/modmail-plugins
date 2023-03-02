@@ -352,7 +352,7 @@ class ModerationLogging:
                     return
         author = message.author
         channel = message.channel
-        description = f"The following message was deleted from {channel.mention}: {message.content}"
+        description = f"The following message was deleted from {channel.mention}:\n`{message.content}`"
 
         await self.send_log(
             message.guild,
