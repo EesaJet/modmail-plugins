@@ -95,7 +95,7 @@ class ModerationLogging:
             timestamp=discord.utils.utcnow(),
         )
 
-        if isinstance(target, (discord.Member, discord.User, str)):
+        if isinstance(target, (discord.Member, discord.User)):
             embed.set_thumbnail(url=target.display_avatar.url)
             embed.add_field(name="User", value=target.mention)
             embed.set_footer(text=f"User ID: {target.id}")
@@ -107,6 +107,9 @@ class ModerationLogging:
         elif isinstance(target, discord.abc.GuildChannel):
             embed.add_field(name="Channel", value=f"# {target.name}")
             embed.set_footer(text=f"Channel ID: {target.id}")
+        elif isinstance(target, discord.Message):
+            embed.add_field(name="Author", value=f"# {target.mention}")
+            embed.set_footer(text=f"Message ID: {target.id}")
         else:
             raise TypeError("Invalid type of parameter `target`. Expected type: `Member`, `User`, or `List`.")
 
