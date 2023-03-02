@@ -303,7 +303,6 @@ class ModerationLogging:
         )
 
   async def on_message_edit(
-        
       self,
       before: discord.Message,
       after: discord.Message,
