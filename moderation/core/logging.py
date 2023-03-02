@@ -20,7 +20,8 @@ action_colors = {
     "ban": discord.Color.red(),
     "member joined": discord.Color.green(),
     "member left": discord.Color.red(),
-    "message edited": discord.Color.red(),
+    "message edited": discord.Color.yellow(),
+    "message deleted": discord.Color.red(),
     "multiban": discord.Color.red(),
     "mute": discord.Color.dark_grey(),
 }
@@ -392,9 +393,9 @@ class ModerationLogging:
 
         await self.send_log(
             message.guild,
-            action="message delete",
-            target=f"Message Autor: `{message.author}`",
-            moderator=f"Deleted by `{mod}`",
+            action="message deleted",
+            target=f"Message author: `{message.author}`",
+            moderator=f"Deleted by: `{mod}`",
             message={message.content},
         )
 
