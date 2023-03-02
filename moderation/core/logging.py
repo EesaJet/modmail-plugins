@@ -267,6 +267,12 @@ class ModerationLogging:
         
     async def _on_message_edit(
         
+        self,
+        before: discord.Message,
+        after: discord.Message,
+        moderator: discord.Member
+    ) -> None:
+        
         config = self.cog.guild_config(str(after.guild.id))
         if not config.get("logging"):
             return
@@ -281,12 +287,7 @@ class ModerationLogging:
                     await self._on_message_edit(before, after, entry.user, reason=entry.reason)
                 if found:
                     return
-        
-        self,
-        before: discord.Message,
-        after: discord.Message,
-        moderator: discord.Member
-    ) -> None:
+                
         if before.author.bot:
             return  # ignore messages edited by bots
 
