@@ -332,6 +332,37 @@ class ModerationLogging:
             description=f"`{member}` has been kicked.",
         )
 
+    async def on_member_join(self, member: discord.Member) -> None:
+        """
+        Currently this listener is to search for kicked members.
+        For some reason Discord and discord.py do not dispatch or have a specific event when a guild member
+        was kicked, so we have to do it manually here.
+        """
+        config = self.cog.guild_config(str(member.guild.id))
+        if not config.get("logging"):
+            return
+
+        audit_logs = member.guild.audit_logs(limit=10, action=discord.AuditLogAction.join)
+        async for entry in audit_logs:
+            if int(entry.target.id) == member.id:
+                break
+        else:
+            return
+
+        mod = entry.user
+        if mod == self.bot.user:
+            return
+
+        if entry.created_at.timestamp() < member.joined_at.timestamp():
+            return
+
+        await self.send_log(
+            member.guild,
+            action="join",
+            target=member,
+            description=f"`{member}` has joined the server.",
+        )    
+        
     async def on_member_ban(self, guild: discord.Guild, user: Union[discord.User, discord.Member]) -> None:
         config = self.cog.guild_config(str(guild.id))
         if not config.get("logging"):
