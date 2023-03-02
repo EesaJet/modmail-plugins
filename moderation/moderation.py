@@ -1503,6 +1503,10 @@ class Moderation(commands.Cog):
         await self.logging.on_member_update(*args, **kwargs)
         
     @commands.Cog.listener()
+    async def on_message_edit(self, *args, **kwargs) -> None:
+        await self.logging.on_message_edit(*args, **kwargs)
+        
+    @commands.Cog.listener()
     async def on_member_join(self, *args, **kwargs) -> None:
         await self.logging.on_member_join(*args, **kwargs)
         
