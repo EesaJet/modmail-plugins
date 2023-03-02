@@ -95,7 +95,7 @@ class ModerationLogging:
             timestamp=discord.utils.utcnow(),
         )
 
-        if isinstance(target, (discord.Member, discord.User)):
+        if isinstance(target, (discord.Member, discord.User, str)):
             embed.set_thumbnail(url=target.display_avatar.url)
             embed.add_field(name="User", value=target.mention)
             embed.set_footer(text=f"User ID: {target.id}")
@@ -338,6 +338,30 @@ class ModerationLogging:
             after=f"`{str(after.content)}`",
         )
 
+    async def on_message_delete(self, message: discord.Message) -> None:
+      
+        config = self.cog.guild_config(str(message.guild.id))
+        if not config.get("logging"):
+            return
+
+        audit_logs = message.guild.audit_logs(limit=10)
+        async for entry in audit_logs:
+            if entry.target.id == message.author.id and entry.action in (discord.AuditLogAction.message_delete, discord.AuditLogAction.message_bulk_delete):
+                mod = entry.user
+                if mod == self.bot.user:
+                    return
+        author=message.author
+        mod=entry.user
+
+        await self.send_log(
+            message.guild,
+            action="message deleted",
+            target=f"Message by:`{str(author)}`",
+            moderator=f"Deleted by: `{str(mod)}`",
+            description=f"Message: `{str(message.content)}`",
+        )
+
+  
     async def on_member_remove(self, member: discord.Member) -> None:
         """
         Currently this listener is to search for kicked members.
@@ -369,34 +393,6 @@ class ModerationLogging:
             moderator=mod,
             reason=entry.reason,
             description=f"`{member}` has been kicked.",
-        )
-
-    async def on_message_delete(self, message: discord.Message) -> None:
-      
-        config = self.cog.guild_config(str(message.guild.id))
-        if not config.get("logging"):
-            return
-
-        audit_logs = message.guild.audit_logs(limit=10, action=discord.AuditLogAction.message_delete)
-        async for entry in audit_logs:
-            if int(entry.target.id) == message.id:
-                break
-        else:
-            return
-          
-        mod = entry.user
-        if mod == self.bot.user:
-            return
-      
-        if entry.created_at.timestamp() < message.created_at.timestamp():
-            return
-
-        await self.send_log(
-            message.guild,
-            action="message deleted",
-            target=f"Message author: `{message.author}`",
-            moderator=f"Deleted by: `{mod}`",
-            message={message.content},
         )
 
     async def on_member_join(self, member: discord.Member) -> None:
