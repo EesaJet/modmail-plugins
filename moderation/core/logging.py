@@ -266,6 +266,22 @@ class ModerationLogging:
         )
         
     async def _on_message_edit(
+        
+        config = self.cog.guild_config(str(after.guild.id))
+        if not config.get("logging"):
+            return
+        
+        audit_logs = after.guild.audit_logs(limit=10)
+        found = False
+        async for entry in audit_logs:
+            if int(entry.target.id) == after.id:
+                action = entry.action
+                if action == discord.AuditLogAction.message_edit:
+                    found = True
+                    await self._on_message_edit(before, after, entry.user, reason=entry.reason)
+                if found:
+                    return
+        
         self,
         before: discord.Message,
         after: discord.Message,
