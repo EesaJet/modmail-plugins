@@ -107,9 +107,6 @@ class ModerationLogging:
         elif isinstance(target, discord.abc.GuildChannel):
             embed.add_field(name="Channel", value=f"# {target.name}")
             embed.set_footer(text=f"Channel ID: {target.id}")
-        elif isinstance(target, discord.Message):
-            embed.add_field(name="Author", value=f"# {target.mention}")
-            embed.set_footer(text=f"Message ID: {target.id}")
         else:
             raise TypeError("Invalid type of parameter `target`. Expected type: `Member`, `User`, or `List`.")
 
@@ -353,15 +350,15 @@ class ModerationLogging:
                 mod = entry.user
                 if mod == self.bot.user:
                     return
-        author=message.author
-        mod=entry.user
+        author = message.author
+        channel = message.channel
+        description = f"The following message was deleted from {channel.mention}: {message.content}"
 
         await self.send_log(
             message.guild,
             action="message deleted",
-            target=f"Message by:`{str(author)}`",
-            moderator=f"Deleted by: `{str(mod)}`",
-            description=f"Message: `{str(message.content)}`",
+            target=author,
+            description=description,
         )
 
   
