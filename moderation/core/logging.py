@@ -18,7 +18,8 @@ logger = getLogger(__name__)
 action_colors = {
     "normal": discord.Color.blue(),
     "ban": discord.Color.red(),
-    "join": discord.Color.green(),
+    "member joined": discord.Color.green(),
+    "member left": discord.Color.red(),
     "multiban": discord.Color.red(),
     "mute": discord.Color.dark_grey(),
 }
@@ -334,20 +335,29 @@ class ModerationLogging:
         )
 
     async def on_member_join(self, member: discord.Member) -> None:
-        """
-        Currently this listener is to search for kicked members.
-        For some reason Discord and discord.py do not dispatch or have a specific event when a guild member
-        was kicked, so we have to do it manually here.
-        """
+
         config = self.cog.guild_config(str(member.guild.id))
         if not config.get("logging"):
             return
 
         await self.send_log(
             member.guild,
-            action="join",
+            action="member joined",
             target=member,
             description=f"`{member}` has joined the server.",
+        )
+        
+    async def on_member_remove(self, member: discord.Member) -> None:
+
+        config = self.cog.guild_config(str(member.guild.id))
+        if not config.get("logging"):
+            return
+
+        await self.send_log(
+            member.guild,
+            action="member left",
+            target=member,
+            description=f"`{member}` has left the server.",
         )    
         
     async def on_member_ban(self, guild: discord.Guild, user: Union[discord.User, discord.Member]) -> None:
