@@ -302,7 +302,7 @@ class ModerationLogging:
             **kwargs,
         )
 
-  async def on_message_edit(self, before: discord.Message, after: discord.Message, moderator: discord.Member) -> None:
+    async def on_message_edit(self, before: discord.Message, after: discord.Message, moderator: discord.Member) -> None:
       config = self.cog.guild_config(str(after.guild.id))
       if not config.get("logging"):
           return
