@@ -325,17 +325,16 @@ class ModerationLogging:
         author = before.author
         channel = before.channel
         description = f"Message edited by {author.mention} in {channel.mention}"
-        fields = {
-        "Before": before.content,
-        "After": after.content,
-        }
+        mBefore: before.content
+        mAfter: after.content
   
         await self.send_log(
             guild,
             action="message edited",
-            target=after,
+            target=author,
             description=description,
-            fields=fields,
+            mBefore=mBefore,
+            mafter=mAfter
         )
 
     async def on_member_remove(self, member: discord.Member) -> None:
