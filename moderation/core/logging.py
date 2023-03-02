@@ -303,40 +303,40 @@ class ModerationLogging:
         )
 
     async def on_message_edit(self, before: discord.Message, after: discord.Message) -> None:
-      config = self.cog.guild_config(str(after.guild.id))
-      if not config.get("logging"):
-          return
+        config = self.cog.guild_config(str(after.guild.id))
+        if not config.get("logging"):
+            return
         
-      audit_logs = after.guild.audit_logs(limit=10)
-      found = False
-      async for entry in audit_logs:
-          if int(entry.target.id) == after.id:
-              action = entry.action
-              if action == discord.AuditLogAction.message_edit:
-                  found = True
-                  await self._on_message_edit(before, after, entry.user, reason=entry.reason)
-              if found:
-                  return
+        audit_logs = after.guild.audit_logs(limit=10)
+        found = False
+        async for entry in audit_logs:
+            if int(entry.target.id) == after.id:
+                action = entry.action
+                if action == discord.AuditLogAction.message_edit:
+                    found = True
+                    await self._on_message_edit(before, after, entry.user, reason=entry.reason)
+                if found:
+                    return
                 
 
-      if before.content == after.content:
-            return  # ignore if the message content hasn't changed
-      guild = before.guild
-      author = before.author
-      channel = before.channel
-      description = f"Message edited by {author.mention} in {channel.mention}"
-      fields = {
-      "Before": before.content,
-      "After": after.content,
-      }
+        if before.content == after.content:
+              return  # ignore if the message content hasn't changed
+        guild = before.guild
+        author = before.author
+        channel = before.channel
+        description = f"Message edited by {author.mention} in {channel.mention}"
+        fields = {
+        "Before": before.content,
+        "After": after.content,
+        }
   
-      await self.send_log(
-          guild,
-          action="message edited",
-          target=after,
-          description=description,
-          fields=fields,
-      )
+        await self.send_log(
+            guild,
+            action="message edited",
+            target=after,
+            description=description,
+            fields=fields,
+        )
 
     async def on_member_remove(self, member: discord.Member) -> None:
         """
