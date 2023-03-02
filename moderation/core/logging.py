@@ -333,8 +333,8 @@ class ModerationLogging:
             action="message edited",
             target=author,
             description=description,
-            mBefore=mBefore,
-            mafter=mAfter
+            before=f"`{str(before.content)}`",
+            after=f"`{str(after.content)}`",
         )
 
     async def on_member_remove(self, member: discord.Member) -> None:
