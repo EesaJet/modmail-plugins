@@ -391,7 +391,7 @@ class ModerationLogging:
             return
 
         await self.send_log(
-            member.guild,
+            message.guild,
             action="message delete",
             target=f"Message Autor: `{message.author}`",
             moderator=f"Deleted by `{mod}`",
