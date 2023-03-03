@@ -447,21 +447,17 @@ class Moderation(commands.Cog):
             description=f"`{member}` has been warned.",
         )
 
-    # Purge commands
+      # Purge commands
     @commands.group(aliases=["clear"], invoke_without_command=True)
     @checks.has_permissions(PermissionLevel.MODERATOR)
     async def purge(self, ctx: commands.Context, amount: int):
         """
         Purge messages in the current channel.
-
         `amount` must be an integer between `1` to `100`.
         Max `amount` is `100`.
-
         In order for this to work, the bot must have `Manage Messages` and `Read Message History` permissions.
         These commands cannot be used in a private message.
-
         When the command is done doing its work, you will get a message detailing which users got removed and how many messages got removed.
-
         **Notes:**
         - Pinned messages will be ignored. However, if you purge using any of this command's sub-commands pinned messages also will be purged.
         - To purge messages including the pinned messages, use command `{prefix}purge all <amount>` instead.
@@ -536,7 +532,6 @@ class Moderation(commands.Cog):
     async def _remove_all(self, ctx: commands.Context, amount: int):
         """
         Removes all types of messages.
-
         `amount` must be an integer between `1` to `100`.
         Max `amount` is `100`.
         """
@@ -570,7 +565,6 @@ class Moderation(commands.Cog):
     @checks.has_permissions(PermissionLevel.MODERATOR)
     async def _remove_contains(self, ctx: commands.Context, *, substr: str):
         """Removes all messages containing a substring.
-
         The substring must be at least 3 characters long.
         """
         if len(substr) < 3:
@@ -624,13 +618,10 @@ class Moderation(commands.Cog):
     async def _remove_custom(self, ctx: commands.Context, *, args: str):
         """
         A more advanced purge command.
-
         This command uses a powerful "command line" syntax.
         Most options support multiple values to indicate 'any' match.
         If the value has spaces it must be quoted.
-
         The messages are only deleted if all options are met unless the `--or` flag is passed, in which case only if any is met.
-
         **The following options are valid:**
         `--user`: A mention or name of the user to remove.
         `--contains`: A substring to search for in the message.
@@ -639,7 +630,6 @@ class Moderation(commands.Cog):
         `--search`: How many messages to search. Default 10. Max 100.
         `--after`: Messages must come after this message ID.
         `--before`: Messages must come before this message ID.
-
         **Flag options (no arguments):**
         `--bot`: Check if it's a bot user.
         `--embeds`: Check if the message has embeds.
@@ -727,7 +717,7 @@ class Moderation(commands.Cog):
 
         args.search = max(0, min(100, args.search))  # clamp from 0-100
         await self.do_removal(ctx, args.search, predicate, before=args.before, after=args.after)
-
+        
     # Kick command
     @commands.command()
     @checks.has_permissions(PermissionLevel.MODERATOR)
