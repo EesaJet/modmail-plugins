@@ -18,8 +18,10 @@ logger = getLogger(__name__)
 action_colors = {
     "normal": discord.Color.blue(),
     "ban": discord.Color.red(),
+    "user joined voice channel": discord.Color.green(),
     "member joined": discord.Color.green(),
     "member left": discord.Color.red(),
+    "user left voice channel": discord.Color.red(),
     "message edited": discord.Color.yellow(),
     "message deleted": discord.Color.red(),
     "multiban": discord.Color.red(),
@@ -407,6 +409,27 @@ class ModerationLogging:
             target=member,
             description=f"`{member}` has joined the server.",
         )
+
+    async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState) -> None:
+
+        config = self.cog.guild_config(str(member.guild.id))
+        if not config.get("logging"):
+            return
+
+        if before.channel is None and after.channel is not None:
+          await self.send_log(
+              member.guild,
+              action="user joined voice channel",
+              target=member,
+              description=f"`{member}` has joined `{after.channel.name}`",
+
+        elif before.channel is not None and after.channel is None:
+          await self.send_log(
+              member.guild,
+              action="user left voice channel",
+              target=member,
+              description=f"`{member}` has left `{after.channel.name}`",
+        ) 
         
     async def on_member_remove(self, member: discord.Member) -> None:
 
