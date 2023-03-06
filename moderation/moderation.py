@@ -1509,8 +1509,8 @@ class Moderation(commands.Cog):
         await self.logging.on_voice_state_update(*args, **kwargs)
         
     @commands.Cog.listener()
-    async def on_member_remove(self, *args, **kwargs) -> None:
-        await self.logging.on_member_remove(*args, **kwargs)
+    async def on_invite_create(self, *args, **kwargs) -> None:
+        await self.logging.on_invite_create(*args, **kwargs)
         
     @commands.Cog.listener()
     async def on_member_remove(self, *args, **kwargs) -> None:
