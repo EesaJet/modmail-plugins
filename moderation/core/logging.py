@@ -17,14 +17,21 @@ logger = getLogger(__name__)
 
 action_colors = {
     "normal": discord.Color.blue(),
-    "ban": discord.Color.red(),
+
+    #greens
     "user joined voice channel": discord.Color.green(),
+    "invite created": discord.Color.green(),
     "member joined": discord.Color.green(),
+
+    #reds
+    "ban": discord.Color.red(),
     "member left": discord.Color.red(),
     "user left voice channel": discord.Color.red(),
-    "message edited": discord.Color.yellow(),
     "message deleted": discord.Color.red(),
     "multiban": discord.Color.red(),
+
+    #others
+    "message edited": discord.Color.yellow(),
     "mute": discord.Color.dark_grey(),
 }
 
@@ -417,15 +424,17 @@ class ModerationLogging:
     #logs for creating invite
     async def on_invite_create(self, invite: discord.Invite) -> None:
 
-        config = self.cog.guild_config(str(member.guild.id))
+        config = self.cog.guild_config(str(invite.guild.id))
         if not config.get("logging"):
             return
+          
+        member = invite.inviter
 
         await self.send_log(
             invite.guild,
             action="invite created",
-            target=invite,
-            description=f"`{invite.inviter}` created invite `{invite.code}` which expires in {invite.max_age} seconds",
+            target=member,
+            description=f"`{invite.inviter}` created server invite {invite.url} which has {invite.uses} uses and expires in {invite.max_age // 60} minutes from when this message was sent",
         )
 
       
@@ -452,7 +461,7 @@ class ModerationLogging:
             )
 
 
-    #logs for member leavign server  
+    #logs for member leaving server  
     async def on_member_remove(self, member: discord.Member) -> None:
 
         config = self.cog.guild_config(str(member.guild.id))
