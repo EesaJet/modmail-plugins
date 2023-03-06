@@ -423,7 +423,8 @@ class ModerationLogging:
               target=member,
               description=f"`{member}` has joined `{after.channel.name}`",
 
-        elif before.channel is not None and after.channel is None:
+        else:
+          if before.channel is not None and after.channel is None:
           await self.send_log(
               member.guild,
               action="user left voice channel",
