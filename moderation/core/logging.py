@@ -305,6 +305,7 @@ class ModerationLogging:
             **kwargs,
         )
 
+    #logs for edited messages
     async def on_message_edit(self, before: discord.Message, after: discord.Message) -> None:
         config = self.cog.guild_config(str(after.guild.id))
         if not config.get("logging"):
@@ -340,6 +341,7 @@ class ModerationLogging:
             after=f"`{str(after.content)}`",
         )
 
+    #Logs for deleted messages
     async def on_message_delete(self, message: discord.Message) -> None:
       
         config = self.cog.guild_config(str(message.guild.id))
@@ -397,6 +399,7 @@ class ModerationLogging:
             description=f"`{member}` has been kicked.",
         )
 
+    #logs for member joining server
     async def on_member_join(self, member: discord.Member) -> None:
 
         config = self.cog.guild_config(str(member.guild.id))
@@ -410,6 +413,23 @@ class ModerationLogging:
             description=f"`{member}` has joined the server.",
         )
 
+
+    #logs for creating invite
+    async def on_invite_create(self, invite: discord.Invite) -> None:
+
+        config = self.cog.guild_config(str(member.guild.id))
+        if not config.get("logging"):
+            return
+
+        await self.send_log(
+            invite.guild,
+            action="invite created",
+            target=invite,
+            description=f"`{invite.inviter}` created invite `{invite.code}` which expires in {invite.max_age} seconds",
+        )
+
+      
+    #logs for member joinin/leaving VC
     async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState) -> None:
 
         config = self.cog.guild_config(str(member.guild.id))
@@ -430,7 +450,9 @@ class ModerationLogging:
                   target=member,
                   description=f"`{member}` has joined `{after.channel.name}`",
             )
-        
+
+
+    #logs for member leavign server  
     async def on_member_remove(self, member: discord.Member) -> None:
 
         config = self.cog.guild_config(str(member.guild.id))
