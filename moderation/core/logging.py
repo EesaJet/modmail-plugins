@@ -29,6 +29,7 @@ action_colors = {
     "user left voice channel": discord.Color.red(),
     "message deleted": discord.Color.red(),
     "multiban": discord.Color.red(),
+    "invite deleted": discord.Color.red(),
 
     #others
     "message edited": discord.Color.yellow(),
@@ -321,7 +322,7 @@ class ModerationLogging:
         audit_logs = after.guild.audit_logs(limit=10)
         found = False
         async for entry in audit_logs:
-            if int(entry.target.id) == after.id:
+            if str(entry.target.id) == after.id:
                 action = entry.action
                 if action == discord.AuditLogAction.message_edit:
                     found = True
@@ -348,7 +349,7 @@ class ModerationLogging:
             after=f"`{str(after.content)}`",
         )
 
-    #Logs for deleted messages
+    #logs for deleted messages
     async def on_message_delete(self, message: discord.Message) -> None:
       
         config = self.cog.guild_config(str(message.guild.id))
@@ -429,14 +430,34 @@ class ModerationLogging:
             return
           
         member = invite.inviter
+        if invite.max_uses == 0:
+          invitemaxuses = "**No limit** of"
 
         await self.send_log(
             invite.guild,
             action="invite created",
             target=member,
-            description=f"`{invite.inviter}` created server invite {invite.url} which has {invite.uses} uses and expires in {invite.max_age // 60} minutes from when this message was sent",
+            description=f"`{invite.inviter.}` created server invite {invite.url} which can be used {invite.max_uses} times and expires in {invite.max_age // 60} minutes from when this message was sent",
         )
 
+        #logs for deleting invite
+    async def on_invite_delete(self, invite: discord.Invite) -> None:
+
+        config = self.cog.guild_config(str(invite.guild.id))
+        if not config.get("logging"):
+            return
+
+        member = invite.inviter
+
+        async for log in invite.guild.audit_logs(limit=10, action=discord.AuditLogAction.invite_delete):
+            if log.target == invite:
+                # Send a log message showing who deleted the invite
+                await self.send_log(
+                    invite.guild,
+                    action="invite deleted",
+                    target=member,
+                    description=f"`{log.user}` deleted the server invite {invite.url}. The invite was created by `{invite.inviter}`",
+                )
       
     #logs for member joinin/leaving VC
     async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState) -> None:
