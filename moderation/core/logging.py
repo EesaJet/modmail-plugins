@@ -3,6 +3,9 @@ from __future__ import annotations
 from typing import List, Optional, Union, TYPE_CHECKING
 
 import discord
+import datetime
+import pytz
+
 from discord.utils import MISSING
 
 from core.models import getLogger
@@ -414,7 +417,8 @@ class ModerationLogging:
         if not config.get("logging"):
             return
 
-        age = datetime.datetime.utcnow() - member.created_at
+        utcnow = datetime.datetime.now(pytz.utc)
+        age = utcnow - member.created_at
         age_str = f"{age.days} days, {age.seconds // 3600} hours, {(age.seconds // 60) % 60} minutes, and {age.seconds % 60} seconds"
 
         inviter = None
