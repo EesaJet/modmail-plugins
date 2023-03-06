@@ -440,7 +440,7 @@ class ModerationLogging:
             invite.guild,
             action="invite created",
             target=member,
-            description=f"`{invite.inviter.}` created server invite {invite.url} which can be used {invitemaxuses} times and expires in {invite.max_age // 60} minutes from when this message was sent",
+            description=f"`{invite.inviter}` created server invite {invite.url} which can be used {invitemaxuses} times and expires in {invite.max_age // 60} minutes from when this message was sent",
         )
 
         #logs for deleting invite
