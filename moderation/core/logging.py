@@ -327,7 +327,7 @@ class ModerationLogging:
         audit_logs = after.guild.audit_logs(limit=10)
         found = False
         async for entry in audit_logs:
-            if str(entry.target.id) == after.id:
+            if entry.target and str(entry.target.id) == after.id:
                 action = entry.action
                 if action == discord.AuditLogAction.message_edit:
                     found = True
@@ -363,7 +363,7 @@ class ModerationLogging:
 
         audit_logs = message.guild.audit_logs(limit=10)
         async for entry in audit_logs:
-            if entry.target.id == message.author.id and entry.action in (discord.AuditLogAction.message_delete, discord.AuditLogAction.message_bulk_delete):
+            if entry.target and entry.target.id == message.author.id and entry.action in (discord.AuditLogAction.message_delete, discord.AuditLogAction.message_bulk_delete):
                 mod = entry.user
                 if mod == self.bot.user:
                     return
