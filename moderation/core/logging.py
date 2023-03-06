@@ -432,12 +432,15 @@ class ModerationLogging:
         member = invite.inviter
         if invite.max_uses == 0:
           invitemaxuses = "**No limit** of"
+        else:
+          invitemaxuses = invite.max_uses
+          
 
         await self.send_log(
             invite.guild,
             action="invite created",
             target=member,
-            description=f"`{invite.inviter.}` created server invite {invite.url} which can be used {invite.max_uses} times and expires in {invite.max_age // 60} minutes from when this message was sent",
+            description=f"`{invite.inviter.}` created server invite {invite.url} which can be used {invitemaxuses} times and expires in {invite.max_age // 60} minutes from when this message was sent",
         )
 
         #logs for deleting invite
