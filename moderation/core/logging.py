@@ -414,12 +414,35 @@ class ModerationLogging:
         if not config.get("logging"):
             return
 
-        await self.send_log(
-            member.guild,
-            action="member joined",
-            target=member,
-            description=f"`{member}` has joined the server.",
-        )
+        async for log in member.guild.audit_logs(limit=1, action=discord.AuditLogAction.bot_add):
+            if log.target == member:
+                invite_code = None
+                invite_creator = None
+
+                async for invite_log in member.guild.audit_logs(limit=5, action=discord.AuditLogAction.invite_create):
+                    if invite_log.created_at > log.created_at:
+                        break
+                    if invite_log.user == log.user:
+                        invite_code = invite_log.target.code
+                        invite_creator = invite_log.user
+
+                account_age = datetime.utcnow() - member.created_at
+
+                # Send a log message showing the invite code, creator, and account age
+                if invite_code is not None:
+                    await self.send_log(
+                        member.guild,
+                        action="member joined",
+                        target=member,
+                        description=f"`{member}` joined using invite `{invite_code}` created by `{invite_creator}`.\nAccount age: {account_age}.",
+                    )
+                else:
+                    await self.send_log(
+                        member.guild,
+                        action="member joined",
+                        target=member,
+                        description=f"`{member}` joined without using an invite link.\nAccount age: {account_age}.",
+                    )
 
 
     #logs for creating invite
