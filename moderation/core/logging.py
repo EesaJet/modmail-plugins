@@ -431,16 +431,20 @@ class ModerationLogging:
           
         member = invite.inviter
         if invite.max_uses == 0:
-          invitemaxuses = "**No limit** of"
+          invitemaxuses = "**has no limit of uses**"
         else:
-          invitemaxuses = invite.max_uses
+          invitemaxuses =f"can be used {invite.max_uses} times"
+        if invite.max_age == 0:
+          invitemaxage = "**never expires**"
+        else:
+          invitemaxage =f"expires in {invite.max_age // 60} minutes from when this message was sent"
           
 
         await self.send_log(
             invite.guild,
             action="invite created",
             target=member,
-            description=f"`{invite.inviter}` created server invite {invite.url} which can be used {invitemaxuses} times and expires in {invite.max_age // 60} minutes from when this message was sent",
+            description=f"`{invite.inviter}` created server invite {invite.url} which {invitemaxuses} and {invitemaxage}",
         )
 
         #logs for deleting invite
@@ -450,16 +454,16 @@ class ModerationLogging:
         if not config.get("logging"):
             return
 
-        member = invite.inviter
 
         async for log in invite.guild.audit_logs(limit=10, action=discord.AuditLogAction.invite_delete):
             if log.target == invite:
+                member = log.user
                 # Send a log message showing who deleted the invite
                 await self.send_log(
                     invite.guild,
                     action="invite deleted",
                     target=member,
-                    description=f"`{log.user}` deleted the server invite {invite.url}. The invite was created by `{invite.inviter}`",
+                    description=f"`{log.user}` deleted the server invite {invite.url}.",
                 )
       
     #logs for member joinin/leaving VC
