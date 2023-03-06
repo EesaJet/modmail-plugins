@@ -414,36 +414,28 @@ class ModerationLogging:
         if not config.get("logging"):
             return
 
-        async for log in member.guild.audit_logs(limit=1, action=discord.AuditLogAction.bot_add):
-            if log.target == member:
-                invite_code = None
-                invite_creator = None
+        age = datetime.datetime.utcnow() - member.created_at
+        age_str = f"{age.days} days, {age.seconds // 3600} hours, {(age.seconds // 60) % 60} minutes, and {age.seconds % 60} seconds"
 
-                async for invite_log in member.guild.audit_logs(limit=5, action=discord.AuditLogAction.invite_create):
-                    if invite_log.created_at > log.created_at:
-                        break
-                    if invite_log.user == log.user:
-                        invite_code = invite_log.target.code
-                        invite_creator = invite_log.user
-
-                account_age = datetime.utcnow() - member.created_at
-
-                # Send a log message showing the invite code, creator, and account age
-                if invite_code is not None:
-                    await self.send_log(
-                        member.guild,
-                        action="member joined",
-                        target=member,
-                        description=f"`{member}` joined using invite `{invite_code}` created by `{invite_creator}`.\nAccount age: {account_age}.",
-                    )
-                else:
-                    await self.send_log(
-                        member.guild,
-                        action="member joined",
-                        target=member,
-                        description=f"`{member}` joined without using an invite link.\nAccount age: {account_age}.",
-                    )
-
+        inviter = None
+        invites_before = await member.guild.invites()
+        await asyncio.sleep(1)  # wait 1 second to ensure invite info has updated
+        invites_after = await member.guild.invites()
+        for invite in invites_after:
+            if invite not in invites_before:
+                inviter = invite.inviter
+    
+        description = f"`{member}` has joined the server. Their account is {age_str} old."
+    
+        if inviter:
+            description += f" They were invited by `{inviter}` using the invite `{invite.code}`."
+    
+        await self.send_log(
+            member.guild,
+            action="member joined",
+            target=member,
+            description=description,
+        )
 
     #logs for creating invite
     async def on_invite_create(self, invite: discord.Invite) -> None:
