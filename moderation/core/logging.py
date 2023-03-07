@@ -370,18 +370,13 @@ class ModerationLogging:
                     return
         author = message.author
         channel = message.channel
-        moderator = log.user
 
-        if moderator != author:
-          description = f"'{moderator}' deleted message sent by '{author}' in {channel.mention}:\n`{message.content}`"
-        else:
-          description = f"The following message was deleted from {channel.mention}:\n`{message.content}`"
+        description = f"Message deleted from {channel.mention}:\n`{message.content}`"
 
         await self.send_log(
             message.guild,
             action="message deleted",
             target=author,
-            moderator=moderator if moderator != author else None,
             description=description,
         )
 
