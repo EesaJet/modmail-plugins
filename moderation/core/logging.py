@@ -543,11 +543,8 @@ class ModerationLogging:
 
         audit_logs = guild.audit_logs(limit=10, action=discord.AuditLogAction.ban)
         async for entry in audit_logs:
-            if int(entry.target.id) == user.id:
+            if entry.target and int(entry.target.id) == user.id:
                 break
-        else:
-            logger.error("Cannot find the audit log entry for user ban of %d, guild %s.", user, guild)
-            return
 
         mod = entry.user
         if mod == self.bot.user:
