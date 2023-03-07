@@ -229,7 +229,7 @@ class ModerationLogging:
         await self.send_log(
             after.guild,
             action="avatar update",
-            description=description
+            description=description,
             target=after,
         )
 
@@ -356,21 +356,25 @@ class ModerationLogging:
         )
 
     #logs for deleted messages
-    async def on_message_delete(self, message: discord.Message) -> None:
-      
+    async def on_raw_message_delete(self, payload: discord.RawMessageDeleteEvent) -> None:
+
+        channel = self.bot.get_channel(payload.channel_id)
+        guild = channel.guild if channel else None
+        if not guild:
+            return
+              
         config = self.cog.guild_config(str(message.guild.id))
         if not config.get("logging"):
             return
 
-        audit_logs = message.guild.audit_logs(limit=10)
-        async for entry in audit_logs:
-            if entry.target and entry.target.id == message.author.id and entry.action in (discord.AuditLogAction.message_delete, discord.AuditLogAction.message_bulk_delete):
-                mod = entry.user
-                if mod == self.bot.user:
-                    return
+        try:
+            message = await self.bot.http.get_message(payload.channel_id, payload.message_id)
+        except discord.NotFound:
+            # message no longer exists, can't log anything
+            return
+          
         author = message.author
-        channel = message.channel
-        description = f"The following message was deleted from {channel.mention}:\n`{message.content}`"
+        description = f"Message deleted from {channel.mention}:\n`{message.content}`"
 
         await self.send_log(
             message.guild,
