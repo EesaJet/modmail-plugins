@@ -371,7 +371,7 @@ class ModerationLogging:
         author = message.author
         channel = message.channel
       
-        if channel.id == "455207881747464192":
+        if channel.id == 455207881747464192:
           description = ":exclamation: A Director or member of SMT has deleted a message from this channel. Please review the main server audit logs to find the user who deleted the message."
         else:
           description = f"Message deleted from {channel.mention}:\n`{message.content}`"
