@@ -370,8 +370,11 @@ class ModerationLogging:
                     return
         author = message.author
         channel = message.channel
-
-        description = f"Message deleted from {channel.mention}:\n`{message.content}`"
+      
+        if channel.id == "455207881747464192":
+          description = ":exclamation: A Director or member of SMT has deleted a message from this channel. Please review the main server audit logs to find the user who deleted the message."
+        else:
+          description = f"Message deleted from {channel.mention}:\n`{message.content}`"
 
         await self.send_log(
             message.guild,
@@ -544,7 +547,7 @@ class ModerationLogging:
         audit_logs = guild.audit_logs(limit=10, action=discord.AuditLogAction.ban)
         async for entry in audit_logs:
             if entry.target and int(entry.target.id) == user.id:
-                break
+                return
 
         mod = entry.user
         if mod == self.bot.user:
