@@ -229,6 +229,7 @@ class ModerationLogging:
         await self.send_log(
             after.guild,
             action="avatar update",
+            description=description
             target=after,
         )
 
