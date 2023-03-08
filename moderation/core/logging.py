@@ -208,7 +208,7 @@ class ModerationLogging:
         audit_logs = after.guild.audit_logs(limit=10)
         found = False
         async for entry in audit_logs:
-            if entry.target and int(entry.target.id) == after.id:
+            if entry.target and str(entry.target.id) == after.id:
                 action = entry.action
                 if action == discord.AuditLogAction.member_update:
                     if hasattr(entry.after, "nick"):
@@ -324,7 +324,10 @@ class ModerationLogging:
         config = self.cog.guild_config(str(after.guild.id))
         if not config.get("logging"):
             return
-        
+
+        if after.author.id == 928809995074695209:
+            return
+
         audit_logs = after.guild.audit_logs(limit=10)
         found = False
         async for entry in audit_logs:
