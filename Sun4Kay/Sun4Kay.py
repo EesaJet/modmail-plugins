@@ -10,7 +10,7 @@ class Kay(commands.Cog):
     async def on_message(self, message):
         if "KAY" in message.content.upper():
             await message.add_reaction("KAYA:813843744385269762")
-        if "SUN" in message.content.upper() and not message.author.bot:
+        if "SUN" in message.content.upper() and not message.author.bot and "SUNDAY" not in message.content.upper():
             await message.channel.send("Here comes the sun!")
             await message.channel.send("<a:KayA:813843744385269762>")
         if "MELLOW" in message.content.upper() and not message.author.bot:
