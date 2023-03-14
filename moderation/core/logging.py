@@ -36,6 +36,7 @@ action_colors = {
     "member left": discord.Color.red(),
     "user left voice channel": discord.Color.red(),
     "message deleted": discord.Color.red(),
+    "bulk message deleted": discord.Color.red(),
     "multiban": discord.Color.red(),
     "invite deleted": discord.Color.red(),
 
@@ -511,8 +512,9 @@ class ModerationLogging:
         if channel is None or self.is_whitelisted(guild, channel):
             return
 
+        ignored_channel_ids = [455207881747464192, 937999681915604992]
         message = payload.cached_message
-        if message and message.author.bot:
+        if message and message.author.bot and message.channel.id not in ignored_channel_ids:
             return
 
         action = "message deleted"
@@ -532,16 +534,14 @@ class ModerationLogging:
             content = None
             footer_text = f"Message ID: {payload.message_id}\nChannel ID: {payload.channel_id}"
 
-          
-        if channel == 455207881747464192 or channel == 937999681915604992:
-            embed.description = ":exclamation: A Director or member of SMT has deleted a message from this channel. Please review the main server audit logs to find the user who deleted the message."
-        else:
-            embed.description = f"**Message deleted in {channel.mention}:**\n"
+        embed.description = f"**Message deleted in {channel.mention}:**\n"
         if content:
             embed.description += truncate(content, Limit.embed_description - len(embed.description))
         else:
-            embed.description = f":hand_splayed: Message deleted in {channel.mention}, however the message is too old for its content to be retrieved.\n"
+            embed.description = f":hand_splayed: Message deleted in {channel.mention}, however the message is too old for its contents to be retrieved.\n"
             embed.set_footer(text=footer_text)
+        if channel.id in ignored_channel_ids:
+            embed.description = ":exclamation: A Director or member of SMT has deleted a message from this channel. Please review the main server audit logs to find the user who deleted the message."
 
         await self.send_log(
             guild,
