@@ -529,28 +529,14 @@ class ModerationLogging:
             embed.add_field(name="Message info", value=info)
             footer_text = f"Message ID: {message.id}\nChannel ID: {message.channel.id}"
         else:
-            try:
-                channel = await client.fetch_channel(payload.channel_id)
-                message = await channel.fetch_message(payload.message_id)
-                content = f"`{message.content}`"
-                info = (
-                    f"Sent by: {message.author.mention}\n"
-                    f"Message sent on: {discord.utils.format_dt(message.created_at)}\n"
-                )
-                embed.add_field(name="Message info", value=info)
-                footer_text = f"Message ID: {message.id}\nChannel ID: {channel.id}"
-            except discord.NotFound:
-                content = None
-                footer_text = f"Message ID: {payload.message_id}\nChannel ID: {payload.channel_id}"
+            content = None
+            footer_text = f"Message ID: {payload.message_id}\nChannel ID: {payload.channel_id}"
 
           
-        if message.channel.id == 455207881747464192 or message.channel.id == 937999681915604992:
+        if channel == 455207881747464192 or channel == 937999681915604992:
             embed.description = ":exclamation: A Director or member of SMT has deleted a message from this channel. Please review the main server audit logs to find the user who deleted the message."
         else:
             embed.description = f"**Message deleted in {channel.mention}:**\n"
-
-
-      
         if content:
             embed.description += truncate(content, Limit.embed_description - len(embed.description))
         else:
