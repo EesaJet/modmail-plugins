@@ -521,7 +521,7 @@ class ModerationLogging:
             timestamp=discord.utils.utcnow(),
         )
         if message:
-            content = `message.content`
+            content = f"`{message.content}`"
             info = (
                 f"Sent by: {message.author.mention}\n"
                 f"Message sent on: {discord.utils.format_dt(message.created_at)}\n"
