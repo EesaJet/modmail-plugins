@@ -19,6 +19,9 @@ class Kay(commands.Cog):
         if "MELLOW" in message.content.upper() and not message.author.bot:
             await message.channel.send("STOP IT MELLOW!")
             await message.channel.send(":black_cat:")
+        if "BREAKDATE" in message.content.upper() and not message.author.bot:
+            await message.channel.send("ROTOXIC HAVE DONE A BREAKDATE! :boom:")
+            await message.channel.send("https://tenor.com/view/roblox-developer-crash-gif-24842627")
 
 async def setup(bot):
     await bot.add_cog(Kay(bot))
