@@ -540,7 +540,7 @@ class ModerationLogging:
         if content:
             embed.description += truncate(content, Limit.embed_description - len(embed.description))
         else:
-            footer_text = f"The message is too old, it's content cannot be retrieved.\n{footer_text}"
+        embed.description = f":hand_splayed: Message deleted in {channel.mention}, however the message is too old for its content to be retrieved.\n"
         embed.set_footer(text=footer_text)
 
         await self.send_log(
