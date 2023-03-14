@@ -530,13 +530,24 @@ class ModerationLogging:
             footer_text = f"Message ID: {message.id}\nChannel ID: {message.channel.id}"
         else:
             content = None
+            info = (
+                f"Sent by: {message.author.mention}\n"
+                f"Message sent on: {discord.utils.format_dt(message.created_at)}\n"
+            )
             footer_text = f"Message ID: {payload.message_id}\nChannel ID: {payload.channel_id}"
 
-        embed.description = f"**Message deleted in {channel.mention}:**\n"
+          
+        if message.channel.id == 455207881747464192 or message.channel.id == 937999681915604992:
+            embed.description = ":exclamation: A Director or member of SMT has deleted a message from this channel. Please review the main server audit logs to find the user who deleted the message."
+        else:
+            embed.description = f"**Message deleted in {channel.mention}:**\n"
+
+
+      
         if content:
             embed.description += truncate(content, Limit.embed_description - len(embed.description))
         else:
-            footer_text = f"The message content cannot be retrieved.\n{footer_text}"
+            footer_text = f"The message is too old, it's content cannot be retrieved.\n{footer_text}"
         embed.set_footer(text=footer_text)
 
         await self.send_log(
