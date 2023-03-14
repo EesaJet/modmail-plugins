@@ -529,12 +529,19 @@ class ModerationLogging:
             embed.add_field(name="Message info", value=info)
             footer_text = f"Message ID: {message.id}\nChannel ID: {message.channel.id}"
         else:
-            content = None
-            info = (
-                f"Sent by: {message.author.mention}\n"
-                f"Message sent on: {discord.utils.format_dt(message.created_at)}\n"
-            )
-            footer_text = f"Message ID: {payload.message_id}\nChannel ID: {payload.channel_id}"
+            try:
+                channel = await client.fetch_channel(payload.channel_id)
+                message = await channel.fetch_message(payload.message_id)
+                content = f"`{message.content}`"
+                info = (
+                    f"Sent by: {message.author.mention}\n"
+                    f"Message sent on: {discord.utils.format_dt(message.created_at)}\n"
+                )
+                embed.add_field(name="Message info", value=info)
+                footer_text = f"Message ID: {message.id}\nChannel ID: {channel.id}"
+            except discord.NotFound:
+                content = None
+                footer_text = f"Message ID: {payload.message_id}\nChannel ID: {payload.channel_id}"
 
           
         if message.channel.id == 455207881747464192 or message.channel.id == 937999681915604992:
