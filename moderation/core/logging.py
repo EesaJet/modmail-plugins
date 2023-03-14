@@ -653,6 +653,7 @@ class ModerationLogging:
         if info is not None:
             embed.add_field(name="Message info", value=info)
         embed.set_footer(text=footer_text)
+        embed.set_thumbnail(url=target.display_avatar.url)
 
         await self.send_log(
             guild,
