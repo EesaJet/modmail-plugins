@@ -540,7 +540,7 @@ class ModerationLogging:
         else:
             embed.description = f":hand_splayed: Message deleted in {channel.mention}, however the message is too old for its contents to be retrieved.\n"
             embed.set_footer(text=footer_text)
-        if channel.id in ignored_channel_ids and message.author.bot:
+        if channel.id in ignored_channel_ids:
             embed.description = ":exclamation: A Director or member of SMT has deleted a message from this channel. Please review the main server audit logs to find the user who deleted the message."
 
         await self.send_log(
