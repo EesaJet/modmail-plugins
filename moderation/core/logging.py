@@ -649,6 +649,9 @@ class ModerationLogging:
             except discord.NotFound:
                 pass
             footer_text = f"The former message content cannot be found.\n{footer_text}"
+
+        message = await channel.fetch_message(message_id)
+        target = message.author
         embed.add_field(name="After", value=truncate(new_content, Limit.embed_field_value) or "No Content")
         if info is not None:
             embed.add_field(name="Message info", value=info)
