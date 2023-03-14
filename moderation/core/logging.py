@@ -1,16 +1,19 @@
 from __future__ import annotations
 
-from typing import List, Optional, Union, TYPE_CHECKING
+import io
+
+from typing import Any, Dict, List, Optional, Union, TYPE_CHECKING
 
 import discord
 import datetime
 import pytz
 import asyncio
 
-
+from discord.ext.modmail_utils import Limit, plural
 from discord.utils import MISSING
 
 from core.models import getLogger
+from core.utils import truncate
 
 
 if TYPE_CHECKING:
@@ -41,7 +44,6 @@ action_colors = {
     "mute": discord.Color.dark_grey(),
 }
 
-
 class ModerationLogging:
     """
     ModerationLogging instance to handle and manage the logging feature.
@@ -51,16 +53,43 @@ class ModerationLogging:
         self.cog: Moderation = cog
         self.bot: ModmailBot = cog.bot
 
+    def is_enabled(self, guild: discord.Guild) -> bool:
+        """
+        Returns `True` if logging is enabled for the specified guild.
+        """
+        config = self.cog.guild_config(str(guild.id))
+        return config.get("logging", False)
+
+    def is_whitelisted(self, guild: discord.Guild, channel: discord.TextChannel) -> bool:
+        """
+        Returns `True` if channel or its category is whitelisted.
+        """
+        config = self.cog.guild_config(str(guild.id))
+        whitelist_ids = config.get("channel_whitelist", [])
+        if str(channel.id) in whitelist_ids:
+            return True
+        category = channel.category
+        if category and str(category.id) in whitelist_ids:
+            return True
+        return False
+
     async def send_log(
         self,
         guild: discord.Guild,
         *,
         action: str,
-        target: Union[discord.Member, discord.User, List[discord.Member]],
-        description: str,
+        target: Optional[
+            Union[
+                discord.Member,
+                discord.User,
+                List[discord.Member],
+            ]
+        ] = None,
+        description: Optional[str] = None,
         moderator: Optional[discord.Member] = None,
         reason: Optional[str] = None,
-        **kwargs,
+        send_params: Optional[Dict[str, Any]] = None,
+        **kwargs: Dict[str, Any],
     ) -> None:
         """
         Sends logs to the log channel.
@@ -80,17 +109,17 @@ class ModerationLogging:
             Moderator that executed this moderation action.
         reason: Optional[str]
             Reason for this moderation action.
+        send_params: Optional[Dict[str, Any]]
+            Additional parameter to use when sending the log message.
         """
         config = self.cog.guild_config(str(guild.id))
-
-        if not config.get("logging"):
-            return
         channel = config.log_channel
         if channel is None:
             return
 
-        send_params = {}
         webhook = config.webhook or await self._get_or_create_webhook(channel)
+        if send_params is None:
+            send_params = {}
         if webhook:
             if not config.webhook:
                 config.webhook = webhook
@@ -101,29 +130,36 @@ class ModerationLogging:
         else:
             send_method = channel.send
 
-        # Parsing args and kwargs, and sending embed.
-        color = action_colors.get(action, action_colors["normal"])
-        embed = discord.Embed(
-            title=action.title(),
-            description=description,
-            color=color,
-            timestamp=discord.utils.utcnow(),
-        )
-
-        if isinstance(target, (discord.Member, discord.User)):
-            embed.set_thumbnail(url=target.display_avatar.url)
-            embed.add_field(name="User", value=target.mention)
-            embed.set_footer(text=f"User ID: {target.id}")
-        elif isinstance(target, list):
-            embed.add_field(
-                name="User" if len(target) == 1 else "Users",
-                value="\n".join(str(m) for m in target),
+        # In some events (e.g. message updates) the embed is already provided.
+        embed = kwargs.pop("embed", None)
+        if embed is None:
+            color = action_colors.get(action, action_colors["normal"])
+            embed = discord.Embed(
+                description=description,
+                color=color,
+                timestamp=discord.utils.utcnow(),
             )
-        elif isinstance(target, discord.abc.GuildChannel):
-            embed.add_field(name="Channel", value=f"# {target.name}")
-            embed.set_footer(text=f"Channel ID: {target.id}")
-        else:
-            raise TypeError("Invalid type of parameter `target`. Expected type: `Member`, `User`, or `List`.")
+
+        # Parsing args and kwargs, and sending embed.
+        embed.title = action.title()
+
+        if target is not None:
+            if isinstance(target, (discord.Member, discord.User)):
+                embed.set_thumbnail(url=target.display_avatar.url)
+                embed.add_field(name="User", value=target.mention)
+                embed.set_footer(text=f"User ID: {target.id}")
+            elif isinstance(target, list):
+                embed.add_field(
+                    name="User" if len(target) == 1 else "Users",
+                    value="\n".join(str(m) for m in target),
+                )
+            elif isinstance(target, discord.abc.GuildChannel):
+                embed.add_field(name="Channel", value=f"# {target.name}")
+                embed.set_footer(text=f"Channel ID: {target.id}")
+            else:
+                raise TypeError(
+                    f"Invalid type of target. Expected Member, User, GuildChannel, List, or None. Got {type(target).__name__} instead."
+                )
 
         if reason is not None:
             embed.add_field(name="Reason", value=reason)
@@ -198,8 +234,7 @@ class ModerationLogging:
         - Timed out changes
         - Role updates
         """
-        config = self.cog.guild_config(str(after.guild.id))
-        if not config.get("logging"):
+        if not self.is_enabled(after.guild):
             return
 
         if before.guild_avatar != after.guild_avatar:
@@ -208,7 +243,7 @@ class ModerationLogging:
         audit_logs = after.guild.audit_logs(limit=10)
         found = False
         async for entry in audit_logs:
-            if entry.target and str(entry.target.id) == after.id:
+            if int(entry.target.id) == after.id:
                 action = entry.action
                 if action == discord.AuditLogAction.member_update:
                     if hasattr(entry.after, "nick"):
@@ -229,8 +264,8 @@ class ModerationLogging:
         await self.send_log(
             after.guild,
             action="avatar update",
-            description=description,
             target=after,
+            description=description,
         )
 
     async def _on_member_nick_update(
@@ -319,82 +354,13 @@ class ModerationLogging:
             **kwargs,
         )
 
-    #logs for edited messages
-    async def on_message_edit(self, before: discord.Message, after: discord.Message) -> None:
-        config = self.cog.guild_config(str(after.guild.id))
-        if not config.get("logging"):
-            return
-
-        if after.author.id == 928809995074695209:
-            return
-
-        audit_logs = after.guild.audit_logs(limit=10)
-        found = False
-        async for entry in audit_logs:
-            if entry.target and str(entry.target.id) == after.id:
-                action = entry.action
-                if action == discord.AuditLogAction.message_edit:
-                    found = True
-                    await self._on_message_edit(before, after, entry.user, reason=entry.reason)
-                if found:
-                    return
-                
-
-        if before.content == after.content:
-              return  # ignore if the message content hasn't changed
-        guild = before.guild
-        author = before.author
-        channel = before.channel
-        description = f"Message edited by {author.mention} in {channel.mention}"
-        mBefore: before.content
-        mAfter: after.content
-  
-        await self.send_log(
-            guild,
-            action="message edited",
-            target=author,
-            description=description,
-            before=f"`{str(before.content)}`",
-            after=f"`{str(after.content)}`",
-        )
-
-    #logs for deleted messages
-    async def on_message_delete(self, message: discord.Message) -> None:
-      
-        config = self.cog.guild_config(str(message.guild.id))
-        if not config.get("logging"):
-            return
-
-        audit_logs = message.guild.audit_logs(limit=10)
-        async for log in audit_logs:
-            if log.target and log.target.id == message.author.id and log.action in (discord.AuditLogAction.message_delete, discord.AuditLogAction.message_bulk_delete):
-                mod = log.user
-                if mod == self.bot.user:
-                    return
-        author = message.author
-        channel = message.channel
-      
-        if channel.id == 455207881747464192 or channel.id == 937999681915604992:
-          description = ":exclamation: A Director or member of SMT has deleted a message from this channel. Please review the main server audit logs to find the user who deleted the message."
-        else:
-          description = f"Message deleted from {channel.mention}:\n`{message.content}`"
-
-        await self.send_log(
-            message.guild,
-            action="message deleted",
-            target=author,
-            description=description,
-        )
-
-  
     async def on_member_remove(self, member: discord.Member) -> None:
         """
         Currently this listener is to search for kicked members.
         For some reason Discord and discord.py do not dispatch or have a specific event when a guild member
         was kicked, so we have to do it manually here.
         """
-        config = self.cog.guild_config(str(member.guild.id))
-        if not config.get("logging"):
+        if not self.is_enabled(member.guild):
             return
 
         audit_logs = member.guild.audit_logs(limit=10, action=discord.AuditLogAction.kick)
@@ -420,7 +386,279 @@ class ModerationLogging:
             description=f"`{member}` has been kicked.",
         )
 
-      
+    async def on_member_ban(self, guild: discord.Guild, user: Union[discord.User, discord.Member]) -> None:
+        if not self.is_enabled(guild):
+            return
+
+        audit_logs = guild.audit_logs(limit=10, action=discord.AuditLogAction.ban)
+        async for entry in audit_logs:
+            if int(entry.target.id) == user.id:
+                break
+        else:
+            logger.error("Cannot find the audit log entry for user ban of %d, guild %s.", user, guild)
+            return
+
+        mod = entry.user
+        if mod == self.bot.user:
+            return
+
+        if isinstance(user, discord.Member):
+            if not user.joined_at or entry.created_at.timestamp() < user.joined_at.timestamp():
+                return
+
+        await self.send_log(
+            guild,
+            action="ban",
+            target=user,
+            moderator=mod,
+            reason=entry.reason,
+            description=f"`{user}` has been banned.",
+        )
+
+    async def on_member_unban(self, guild: discord.Guild, user: discord.User) -> None:
+        if not self.is_enabled(guild):
+            return
+
+        audit_logs = guild.audit_logs(limit=10, action=discord.AuditLogAction.unban)
+        async for entry in audit_logs:
+            if int(entry.target.id) == user.id:
+                break
+        else:
+            logger.error("Cannot find the audit log entry for user unban of %d, guild %s.", user, guild)
+            return
+
+        mod = entry.user
+        if mod == self.bot.user:
+            return
+
+        await self.send_log(
+            guild,
+            action="unban",
+            target=user,
+            moderator=mod,
+            reason=entry.reason,
+            description=f"`{user}` is now unbanned.",
+        )
+
+    async def on_guild_channel_create(self, channel: discord.abc.GuildChannel) -> None:
+        if not self.is_enabled(channel.guild):
+            return
+
+        audit_logs = channel.guild.audit_logs(limit=10, action=discord.AuditLogAction.channel_create)
+        async for entry in audit_logs:
+            if int(entry.target.id) == channel.id:
+                break
+        else:
+            logger.error(
+                "Cannot find the audit log entry for channel creation of %d, guild %s.", channel, guild
+            )
+            return
+
+        mod = entry.user
+
+        kwargs = {}
+        if channel.category:
+            kwargs["category"] = channel.category.name
+
+        await self.send_log(
+            channel.guild,
+            action="channel created",
+            target=channel,
+            moderator=mod,
+            description=f"Channel {channel.mention} was created.",
+            reason=entry.reason,
+            **kwargs,
+        )
+
+    async def on_guild_channel_delete(self, channel: discord.abc.GuildChannel) -> None:
+        if not self.is_enabled(channel.guild):
+            return
+
+        audit_logs = channel.guild.audit_logs(limit=10, action=discord.AuditLogAction.channel_delete)
+        async for entry in audit_logs:
+            if int(entry.target.id) == channel.id:
+                break
+        else:
+            logger.error(
+                "Cannot find the audit log entry for channel deletion of %d, guild %s.", channel, guild
+            )
+            return
+
+        mod = entry.user
+
+        kwargs = {}
+        if channel.category:
+            kwargs["category"] = channel.category.name
+
+        await self.send_log(
+            channel.guild,
+            action="channel deleted",
+            target=channel,
+            moderator=mod,
+            description=f"Channel `# {channel.name}` was deleted.",
+            reason=entry.reason,
+            **kwargs,
+        )
+
+    async def on_raw_message_delete(self, payload: discord.RawMessageDeleteEvent) -> None:
+        if not payload.guild_id:
+            return
+        guild = self.bot.get_guild(payload.guild_id)
+        if not guild or not self.is_enabled(guild):
+            return
+
+        channel = guild.get_channel(payload.channel_id)
+        if channel is None or self.is_whitelisted(guild, channel):
+            return
+
+        message = payload.cached_message
+        if message and message.author.bot:
+            return
+
+        action = "message deleted"
+        embed = discord.Embed(
+            color=action_colors.get(action, action_colors["normal"]),
+            timestamp=discord.utils.utcnow(),
+        )
+        if message:
+            content = `message.content`
+            info = (
+                f"Sent by: {message.author.mention}\n"
+                f"Message sent on: {discord.utils.format_dt(message.created_at)}\n"
+            )
+            embed.add_field(name="Message info", value=info)
+            footer_text = f"Message ID: {message.id}\nChannel ID: {message.channel.id}"
+        else:
+            content = None
+            footer_text = f"Message ID: {payload.message_id}\nChannel ID: {payload.channel_id}"
+
+        embed.description = f"**Message deleted in {channel.mention}:**\n"
+        if content:
+            embed.description += truncate(content, Limit.embed_description - len(embed.description))
+        else:
+            footer_text = f"The message content cannot be retrieved.\n{footer_text}"
+        embed.set_footer(text=footer_text)
+
+        await self.send_log(
+            guild,
+            action=action,
+            embed=embed,
+        )
+
+    async def on_raw_bulk_message_delete(self, payload: discord.RawBulkMessageDeleteEvent) -> None:
+        if not payload.guild_id:
+            return
+        guild = self.bot.get_guild(payload.guild_id)
+        if not guild or not self.is_enabled(guild):
+            return
+
+        channel = guild.get_channel(payload.channel_id)
+        if channel is None or self.is_whitelisted(guild, channel):
+            return
+
+        messages = sorted(payload.cached_messages, key=lambda msg: msg.created_at)
+        message_ids = payload.message_ids
+        upload_text = "Deleted messages:\n\n"
+
+        if not messages:
+            upload_text += "There are no known messages.\n"
+            upload_text += "Message IDs: " + ", ".join(map(str, message_ids)) + "."
+        else:
+            known_message_ids = set()
+            for message in messages:
+                known_message_ids.add(message.id)
+                try:
+                    time = message.created_at.strftime("%b %-d, %Y at %-I:%M %p")
+                except ValueError:
+                    time = message.created_at.strftime("%b %d, %Y at %I:%M %p")
+                upload_text += (
+                    f"{time} • {message.author} ({message.author.id})\n"
+                    f"Message ID: {message.id}\n{message.content}\n\n"
+                )
+            unknown_message_ids = message_ids ^ known_message_ids
+            if unknown_message_ids:
+                upload_text += "Unknown message IDs: " + ", ".join(map(str, unknown_message_ids)) + "."
+
+        action = "bulk message deleted"
+        embed = discord.Embed(
+            color=action_colors.get(action, action_colors["normal"]),
+            timestamp=discord.utils.utcnow(),
+        )
+        embed.description = f"**{plural(len(message_ids)):message} deleted from {channel.mention}.**"
+        embed.set_footer(text=f"Channel ID: {payload.channel_id}")
+        fp = io.BytesIO(bytes(upload_text, "utf-8"))
+        send_params = {"file": discord.File(fp, "Messages.txt")}
+
+        await self.send_log(
+            guild,
+            action=action,
+            embed=embed,
+            send_params=send_params,
+        )
+
+    async def on_raw_message_edit(self, payload: discord.RawMessageUpdateEvent) -> None:
+        if not payload.guild_id:
+            return
+        guild = self.bot.get_guild(payload.guild_id)
+        if not guild or not self.is_enabled(guild):
+            return
+
+        channel = guild.get_channel(payload.channel_id)
+        if channel is None or self.is_whitelisted(guild, channel):
+            return
+
+        message_id = payload.message_id
+
+        new_content = payload.data.get("content", "")
+        old_message = payload.cached_message
+
+        if not new_content or (old_message and new_content == old_message.content):
+            # Currently does not support Embed edits
+            return
+
+        action = "message edited"
+        embed = discord.Embed(
+            color=action_colors.get(action, action_colors["normal"]),
+            timestamp=discord.utils.utcnow(),
+        )
+        embed.description = f"**Message edited in {channel.mention}:**\n"
+        footer_text = f"Message ID: {payload.message_id}\nChannel ID: {payload.channel_id}"
+
+        info = None
+        if old_message:
+            # always ignore bot's message
+            if old_message.author.bot:
+                return
+
+            embed.add_field(
+                name="Before", value=truncate(old_message.content, Limit.embed_field_value) or "No Content"
+            )
+            info = (
+                f"Sent by: {old_message.author.mention}\n"
+                f"Message sent on: {discord.utils.format_dt(old_message.created_at)}\n"
+            )
+        else:
+            try:
+                message = await channel.fetch_message(message_id)
+                if message.author.bot:
+                    return
+                info = (
+                    f"Sent by: {message.author.mention}\n"
+                    f"Message sent on: {discord.utils.format_dt(message.created_at)}\n"
+                )
+            except discord.NotFound:
+                pass
+            footer_text = f"The former message content cannot be found.\n{footer_text}"
+        embed.add_field(name="After", value=truncate(new_content, Limit.embed_field_value) or "No Content")
+        if info is not None:
+            embed.add_field(name="Message info", value=info)
+        embed.set_footer(text=footer_text)
+
+        await self.send_log(
+            guild,
+            action=action,
+            embed=embed,
+        )
     #logs for member joining server
     async def on_member_join(self, member: discord.Member) -> None:
 
@@ -541,118 +779,3 @@ class ModerationLogging:
             target=member,
             description=f"`{member}` has left the server.",
         )    
-        
-    async def on_member_ban(self, guild: discord.Guild, user: Union[discord.User, discord.Member]) -> None:
-        config = self.cog.guild_config(str(guild.id))
-        if not config.get("logging"):
-            return
-
-        audit_logs = guild.audit_logs(limit=10, action=discord.AuditLogAction.ban)
-        async for entry in audit_logs:
-            if entry.target and int(entry.target.id) == user.id:
-                return
-
-        mod = entry.user
-        if mod == self.bot.user:
-            return
-
-        if isinstance(user, discord.Member):
-            if not user.joined_at or entry.created_at.timestamp() < user.joined_at.timestamp():
-                return
-
-        await self.send_log(
-            guild,
-            action="ban",
-            target=user,
-            moderator=mod,
-            reason=entry.reason,
-            description=f"`{user}` has been banned.",
-        )
-
-    async def on_member_unban(self, guild: discord.Guild, user: discord.User) -> None:
-        config = self.cog.guild_config(str(guild.id))
-        if not config.get("logging"):
-            return
-
-        audit_logs = guild.audit_logs(limit=10, action=discord.AuditLogAction.unban)
-        async for entry in audit_logs:
-            if int(entry.target.id) == user.id:
-                break
-        else:
-            logger.error("Cannot find the audit log entry for user unban of %d, guild %s.", user, guild)
-            return
-
-        mod = entry.user
-        if mod == self.bot.user:
-            return
-
-        await self.send_log(
-            guild,
-            action="unban",
-            target=user,
-            moderator=mod,
-            reason=entry.reason,
-            description=f"`{user}` is now unbanned.",
-        )
-
-    async def on_guild_channel_create(self, channel: discord.abc.GuildChannel) -> None:
-        config = self.cog.guild_config(str(channel.guild.id))
-        if not config.get("logging"):
-            return
-
-        audit_logs = channel.guild.audit_logs(limit=10, action=discord.AuditLogAction.channel_create)
-        async for entry in audit_logs:
-            if int(entry.target.id) == channel.id:
-                break
-        else:
-            logger.error(
-                "Cannot find the audit log entry for channel creation of %d, guild %s.", channel, guild
-            )
-            return
-
-        mod = entry.user
-
-        kwargs = {}
-        if channel.category:
-            kwargs["category"] = channel.category.name
-
-        await self.send_log(
-            channel.guild,
-            action="channel created",
-            target=channel,
-            moderator=mod,
-            description=f"Channel {channel.mention} was created.",
-            reason=entry.reason,
-            **kwargs,
-        )
-
-    async def on_guild_channel_delete(self, channel: discord.abc.GuildChannel) -> None:
-        config = self.cog.guild_config(str(channel.guild.id))
-        if not config.get("logging"):
-            return
-
-        audit_logs = channel.guild.audit_logs(limit=10, action=discord.AuditLogAction.channel_delete)
-        async for entry in audit_logs:
-            if int(entry.target.id) == channel.id:
-                break
-        else:
-            logger.error(
-                "Cannot find the audit log entry for channel deletion of %d, guild %s.", channel, guild
-            )
-            return
-
-        mod = entry.user
-
-        kwargs = {}
-        if channel.category:
-            kwargs["category"] = channel.category.name
-
-        await self.send_log(
-            channel.guild,
-            action="channel deleted",
-            target=channel,
-            moderator=mod,
-            description=f"Channel `# {channel.name}` was deleted.",
-            reason=entry.reason,
-            **kwargs,
-        )
