@@ -6,8 +6,8 @@ class RobloxGroup(commands.Cog):
 
     def __init__(self, bot, group_id, channel_id):
         self.bot = bot
-        self.group_id = 2572027
-        self.channel_id = 1079457518788554772
+        self.group_id = 4418793
+        self.channel_id = 937837334534172732
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
@@ -21,7 +21,7 @@ class RobloxGroup(commands.Cog):
 
 async def setup(bot):
     # Set your Roblox group ID and channel ID here
-    group_id = 2572027
-    channel_id = 1079457518788554772
+    group_id = 4418793
+    channel_id = 937837334534172732
 
     await bot.add_cog(RobloxGroup(bot, group_id, channel_id))
