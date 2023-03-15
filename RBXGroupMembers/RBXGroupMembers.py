@@ -48,7 +48,7 @@ class RobloxGroupCount(commands.Cog):
 
         # Check if the group count has increased since the last check
         last_count = await self.bot.redis.get(f'group_count:{self.group_id}', encoding='utf-8')
-        if last_count is not None and int(last_count) >= member_count:
+        if last_count is not None and int(last_count) == member_count:
             return
 
         # Post the group count in the channel
