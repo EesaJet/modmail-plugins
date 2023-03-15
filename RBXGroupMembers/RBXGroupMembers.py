@@ -12,7 +12,7 @@ class RobloxGroup(commands.Cog):
         self.bot = bot
         self.group_id = 2572027
         self.channel_id = 455189806180466701
-        self.check_time = datetime.time(hour=21, minute=50)
+        self.check_time = datetime.time(hour=10, minute=0)
         self.member_count = None
 
     async def send_group_count(self):
@@ -21,10 +21,10 @@ class RobloxGroup(commands.Cog):
         data = response.json()
         member_count = data['memberCount']
 
-        if member_count:
+        if member_count >= self.member_count:
             self.member_count = member_count
             channel = self.bot.get_channel(self.channel_id)
-            await channel.send(f"Good morning Quality line! Great news, today we have *{member_count}* in the ROBLOX group!\nLet the sun shine up your day <a:KayA:813843744385269762>")
+            await channel.send(f"Good morning Quality line! Great news, today we have **{member_count} members** in the ROBLOX group!\nLet the sun shine up your day <a:KayA:813843744385269762>")
 
     @tasks.loop(hours=24)
     async def check_group_count(self):
@@ -37,7 +37,7 @@ class RobloxGroup(commands.Cog):
         # Convert check_time to the US/Eastern timezone
         london_tz = pytz.timezone('Europe/London')
         now = datetime.datetime.now(tz=london_tz)
-        check_time = datetime.time(hour=21, minute=50)
+        check_time = datetime.time(hour=10, minute=0)
         next_check = datetime.datetime.combine(now, check_time, london_tz)
     
         # If the next check time has already passed today, add one day to the next check time
@@ -57,7 +57,7 @@ async def setup(bot):
     # Set your Roblox group ID, channel ID, and check time here
     group_id = 2572027
     channel_id = 455189806180466701
-    check_time = datetime.time(hour=21, minute=50)
+    check_time = datetime.time(hour=10, minute=0)
 
     cog = RobloxGroup(bot, group_id, channel_id, check_time)
     bot.add_cog(cog)
