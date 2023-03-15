@@ -54,7 +54,7 @@ class RobloxGroupCount(commands.Cog):
         # Send the group count before starting the loop
         await self.check_group_count()
 
-def setup(bot):
+await def setup(bot):
     # Replace these with your own values
     group_id = 4418793
     channel_id = 937837334534172732
