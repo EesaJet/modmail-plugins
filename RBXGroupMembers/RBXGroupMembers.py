@@ -23,7 +23,7 @@ class RobloxGroupCount(commands.Cog):
         # Convert check_time to the London timezone
         london_tz = pytz.timezone('Europe/London')
         now = datetime.datetime.now(tz=london_tz)
-        check_time = datetime.time(hour=20, minute=04)
+        check_time = datetime.time(hour=20, minute=5)
         next_check = datetime.datetime.combine(now, check_time, london_tz)
 
         # If the next check time has already passed today, add one day to the next check time
