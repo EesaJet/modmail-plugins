@@ -2,6 +2,7 @@ from discord.ext import commands, tasks
 import requests
 import pytz
 import datetime
+import asyncio
 
 
 class RobloxGroup(commands.Cog):
@@ -11,7 +12,7 @@ class RobloxGroup(commands.Cog):
         self.bot = bot
         self.group_id = 4418793
         self.channel_id = 937837334534172732
-        self.check_time = datetime.time(hour=20, minute=18)
+        self.check_time = datetime.time(hour=20, minute=35)
         self.member_count = None
 
     async def send_group_count(self):
@@ -20,7 +21,7 @@ class RobloxGroup(commands.Cog):
         data = response.json()
         member_count = data['memberCount']
 
-        if member_count != self.member_count:
+        if member_count:
             self.member_count = member_count
             channel = self.bot.get_channel(self.channel_id)
             await channel.send(f'Total members: {member_count}')
@@ -36,7 +37,7 @@ class RobloxGroup(commands.Cog):
         # Convert check_time to the US/Eastern timezone
         london_tz = pytz.timezone('Europe/London')
         now = datetime.datetime.now(tz=london_tz)
-        check_time = datetime.time(hour=20, minute=18)
+        check_time = datetime.time(hour=20, minute=35)
         next_check = datetime.datetime.combine(now, check_time, london_tz)
     
         # If the next check time has already passed today, add one day to the next check time
@@ -56,8 +57,9 @@ async def setup(bot):
     # Set your Roblox group ID, channel ID, and check time here
     group_id = 4418793
     channel_id = 937837334534172732
-    check_time = datetime.time(hour=20, minute=18)
+    check_time = datetime.time(hour=20, minute=35)
 
     cog = RobloxGroup(bot, group_id, channel_id, check_time)
     bot.add_cog(cog)
     cog.check_group_count.start()
+
