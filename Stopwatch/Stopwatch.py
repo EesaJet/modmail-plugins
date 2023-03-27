@@ -8,7 +8,6 @@ class Stopwatch(commands.Cog):
 
     @commands.command()
     async def start(self, ctx):
-        """Starts a personal stopwatch for the user."""
 
         started = "Stopwatch started."
         await ctx.send(started)
