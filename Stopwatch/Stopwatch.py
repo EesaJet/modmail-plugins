@@ -10,14 +10,10 @@ class Stopwatch(commands.Cog):
     @commands.command()
     async def start(self, ctx):
         """Starts a personal stopwatch for the user."""
-        if ctx.author.id in self.timers:
-            arm = "You already have a stopwatch running."
-            message = ctx.send(arm)
-            return message
 
         self.timers[ctx.author.id] = datetime.datetime.now()
         started = "Stopwatch started."
-        message = ctx.send(started)
+        message = await ctx.send(started)
         return message
 
 def setup(bot):
