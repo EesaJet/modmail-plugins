@@ -11,7 +11,6 @@ class Stopwatch(commands.Cog):
     async def start(self, ctx):
         """Starts a personal stopwatch for the user."""
 
-        self.timers[ctx.author.id] = datetime.datetime.now()
         started = "Stopwatch started."
         message = await ctx.send(started)
         return message
