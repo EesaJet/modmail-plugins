@@ -27,6 +27,8 @@ class Eesa(commands.Cog):
             await message.add_reaction("👑")
         elif "MICKEY" in message.content.upper():
             await message.add_reaction("🏅")
+        elif "SHANIE" in message.content.upper():
+            await message.add_reaction("🌸")
 
     @commands.command()
     async def say(self, ctx, *, message):
