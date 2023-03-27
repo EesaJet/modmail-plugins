@@ -12,8 +12,7 @@ class Stopwatch(commands.Cog):
         """Starts a personal stopwatch for the user."""
 
         started = "Stopwatch started."
-        message = await ctx.send(started)
-        return message
+        await ctx.send(started)
 
 def setup(bot):
     bot.add_cog(Stopwatch(bot))
