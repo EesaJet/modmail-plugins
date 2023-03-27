@@ -9,7 +9,7 @@ class MessReact(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         if "MICKEY" in message.content.upper():
-            await message.add_reaction(":medal:")
+            await message.add_reaction("🏅")
       
 async def setup(bot):
     await bot.add_cog(MessReact(bot))
