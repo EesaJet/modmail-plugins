@@ -12,12 +12,12 @@ class Stopwatch(commands.Cog):
         """Starts a personal stopwatch for the user."""
         if ctx.author.id in self.timers:
             arm = "You already have a stopwatch running."
-            message = await ctx.send(arm)
+            message = ctx.send(arm)
             return message
 
         self.timers[ctx.author.id] = datetime.datetime.now()
         started = "Stopwatch started."
-        message = await ctx.send(started)
+        message = ctx.send(started)
         return message
 
 def setup(bot):
