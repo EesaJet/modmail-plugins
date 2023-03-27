@@ -12,19 +12,21 @@ class Eesa(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         if "EESA" in message.content.upper():
-            await message.add_reaction("\N{AIRPLANE}")
+            await message.add_reaction("✈️")
         elif "SHIT" in message.content.upper():
-            await message.add_reaction("SHIT:1080259762266050670")
+            await message.add_reaction("💩")
         elif "THAMES" in message.content.upper():
-            await message.add_reaction("\N{SAILBOAT}")
+            await message.add_reaction("⛵")
         elif "PHOTO" in message.content.upper():
-            await message.add_reaction("\N{CAMERA}")
+            await message.add_reaction("📸")
         elif "JAY" in message.content.upper():
             await message.add_reaction("OLDMAN:1080268375911059517")
         elif "ETHAN" in message.content.upper():
             await message.add_reaction("KNIGHT:1080268333976391780")
         elif "DAFFY" in message.content.upper():
-            await message.add_reaction("\N{CROWN}")
+            await message.add_reaction("👑")
+        elif "MICKEY" in message.content.upper():
+            await message.add_reaction("🏅")
 
     @commands.command()
     async def say(self, ctx, *, message):
