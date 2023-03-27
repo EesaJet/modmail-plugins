@@ -9,7 +9,7 @@ class Eesa(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         if "MICKEY" in message.content.upper():
-            await message.add_reaction("\N{MEDAL}")
+            await message.add_reaction(r"\N{MEDAL}")
       
 async def setup(bot):
     await bot.add_cog(Eesa(bot))
