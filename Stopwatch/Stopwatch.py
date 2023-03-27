@@ -1,12 +1,12 @@
-import datetime
 from discord.ext import commands
+import datetime
 
 class Stopwatch(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command()
-    async def say(self, ctx, *, message):
+    async def start(self, ctx, *, message):
 
         started = "Stopwatch started."
         await ctx.send(started)
