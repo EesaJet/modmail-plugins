@@ -26,7 +26,7 @@ class Eesa(commands.Cog):
         elif "DAFFY" in message.content.upper():
             await message.add_reaction("\N{CROWN}")
         elif "MICKEY" in message.content.upper():
-            await message.add_reaction('\N{MILITARY_MDEAL}')
+            await message.add_reaction('\N{MILITARY_MEDAL}')
 
     @commands.command()
     async def say(self, ctx, *, message):
