@@ -1,6 +1,7 @@
 from discord.ext import commands
 from datetime import datetime, timedelta
 import math
+import discord
 
 class Eesa(commands.Cog):
     """Reacts with a banana emoji if someone says banana."""
@@ -74,6 +75,16 @@ class Eesa(commands.Cog):
         elapsed_time_str = f"{hours} Hours {minutes} Minutes {seconds} Seconds"
         await ctx.send(f"Elapsed time: {elapsed_time_str}")
 
+    @commands.command()
+    async def giverole(self, ctx, role_name: str):
+        """Gives everyone a specified role."""
+        role = discord.utils.get(ctx.guild.roles, name=role_name)
+        if role is None:
+            await ctx.send(f"Role {role_name} does not exist.")
+        else:
+            for member in ctx.guild.members:
+                await member.add_roles(role)
+            await ctx.send(f"Role {role_name} has been given to everyone.")
       
 async def setup(bot):
     await bot.add_cog(Eesa(bot))
