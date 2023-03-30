@@ -107,4 +107,4 @@ class Eesa(commands.Cog):
 def setup(bot):
     # Replace <mongo_uri> with your actual MongoDB URI
     stopwatch_cog = Eesa(bot, "mongodb+srv://EesaJet:Hbt0lK5NsjsroK1q@cluster0.uzjva.mongodb.net/?retryWrites=true&w=majority")
-    bot.add_cog(stopwatch_cog)def setup(bot):
+    bot.add_cog(stopwatch_cog)
