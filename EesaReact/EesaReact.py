@@ -104,5 +104,7 @@ class Eesa(commands.Cog):
                 await member.add_roles(role)
             await ctx.send(f"Role {role_name} has been given to everyone.")
       
-async def setup(bot):
-    await bot.add_cog(Eesa(bot))
+def setup(bot):
+    # Replace <mongo_uri> with your actual MongoDB URI
+    stopwatch_cog = Eesa(bot, "mongodb+srv://EesaJet:Hbt0lK5NsjsroK1q@cluster0.uzjva.mongodb.net/?retryWrites=true&w=majority")
+    bot.add_cog(stopwatch_cog)def setup(bot):
