@@ -2,6 +2,7 @@ from discord.ext import commands
 from datetime import datetime, timedelta
 from motor.motor_asyncio import AsyncIOMotorClient
 import math
+import pymongo
 import discord
 
 class Eesa(commands.Cog):
