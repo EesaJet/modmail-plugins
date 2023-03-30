@@ -7,7 +7,7 @@ import discord
 class Eesa(commands.Cog):
     """Reacts with a banana emoji if someone says banana."""
 
-    def __init__(self, bot):
+    def __init__(self, bot, mongo_uri):
         self.bot = bot
         self.mongo_uri = mongo_uri
         self.client = pymongo.MongoClient(self.mongo_uri)
