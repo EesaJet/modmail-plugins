@@ -1,19 +1,14 @@
 from discord.ext import commands
 from datetime import datetime, timedelta
-from motor.motor_asyncio import AsyncIOMotorClient
 import math
-import pymongo
 import discord
 
 class Eesa(commands.Cog):
     """Reacts with a banana emoji if someone says banana."""
 
-    def __init__(self, bot, mongo_uri):
+    def __init__(self, bot):
         self.bot = bot
-        self.mongo_uri = mongo_uri
-        self.client = pymongo.MongoClient(self.mongo_uri)
-        self.db = self.client["stopwatch_db"]
-        self.col = self.db["stopwatch_col"]
+        self.timers = {}
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -44,54 +39,40 @@ class Eesa(commands.Cog):
     @commands.command()
     async def start(self, ctx):
         """Starts a personal stopwatch for the user."""
-        user_id = ctx.author.id
-        stopwatch_data = self.col.find_one({"user_id": user_id})
-        if stopwatch_data:
+        if ctx.author.id in self.timers:
             await ctx.send("You already have a stopwatch running.")
             return
 
-        start_time = datetime.now(timezone.utc)
-        stopwatch_data = {"user_id": user_id, "start_time": start_time}
-        self.col.insert_one(stopwatch_data)
+        self.timers[ctx.author.id] = datetime.now()
         await ctx.send("Stopwatch started.")
 
     @commands.command()
     async def stop(self, ctx):
         """Stops the user's personal stopwatch."""
-        user_id = ctx.author.id
-        stopwatch_data = self.col.find_one({"user_id": user_id})
-        if not stopwatch_data:
+        if ctx.author.id not in self.timers:
             await ctx.send("You don't have a stopwatch running.")
             return
 
-        start_time = stopwatch_data["start_time"]
-        end_time = datetime.now(timezone.utc)
-        elapsed_time = end_time - start_time
+        elapsed_time = datetime.now() - self.timers[ctx.author.id]
         elapsed_seconds = math.ceil(elapsed_time.total_seconds())
         hours, remainder = divmod(elapsed_seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
+        del self.timers[ctx.author.id]
         elapsed_time_str = f"{hours} Hours {minutes} Minutes {seconds} Seconds"
-
-        self.col.delete_one({"user_id": user_id})
         await ctx.send(f"Stopwatch stopped. Elapsed time: {elapsed_time_str}")
 
     @commands.command()
     async def time(self, ctx):
         """Displays the user's elapsed stopwatch time."""
-        user_id = ctx.author.id
-        stopwatch_data = self.col.find_one({"user_id": user_id})
-        if not stopwatch_data:
+        if ctx.author.id not in self.timers:
             await ctx.send("You don't have a stopwatch running.")
             return
 
-        start_time = stopwatch_data["start_time"]
-        end_time = datetime.now(timezone.utc)
-        elapsed_time = end_time - start_time
+        elapsed_time = datetime.now() - self.timers[ctx.author.id]
         elapsed_seconds = math.ceil(elapsed_time.total_seconds())
         hours, remainder = divmod(elapsed_seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
         elapsed_time_str = f"{hours} Hours {minutes} Minutes {seconds} Seconds"
-
         await ctx.send(f"Elapsed time: {elapsed_time_str}")
 
     @commands.command()
@@ -105,7 +86,5 @@ class Eesa(commands.Cog):
                 await member.add_roles(role)
             await ctx.send(f"Role {role_name} has been given to everyone.")
       
-def setup(bot):
-    # Replace <mongo_uri> with your actual MongoDB URI
-    stopwatch_cog = Eesa(bot, "mongodb+srv://EesaJet:Hbt0lK5NsjsroK1q@cluster0.uzjva.mongodb.net/?retryWrites=true&w=majority")
-    bot.add_cog(stopwatch_cog)
+async def setup(bot):
+    await bot.add_cog(Eesa(bot))
