@@ -96,6 +96,28 @@ class Eesa(commands.Cog):
         minutes, seconds = divmod(remainder, 60)
         elapsed_time_str = f"{hours} Hours {minutes} Minutes {seconds} Seconds"
         await ctx.send(f"Elapsed time: {elapsed_time_str}")
+
+
+    @commands.Cog.listener()
+    async def on_member_join(self, member):
+        """Gives a specified role to the new member."""
+        role_id = 1002600411099828326 # Replace with the ID of the role you want to give to new members
+        role = member.guild.get_role(role_id)
+        if role is None:
+            return
+        else:
+            await member.add_roles(role)
+
+    @commands.command()
+    async def giverole(self, ctx, role_name: str):
+        """Gives everyone a specified role."""
+        role = discord.utils.get(ctx.guild.roles, name=role_name)
+        if role is None:
+            await ctx.send(f"Role {role_name} does not exist.")
+        else:
+            for member in ctx.guild.members:
+                await member.add_roles(role)
+            await ctx.send(f"Role {role_name} has been given to everyone.")
       
 async def setup(bot):
     await bot.add_cog(Eesa(bot))
