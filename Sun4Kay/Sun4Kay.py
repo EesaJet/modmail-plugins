@@ -43,7 +43,7 @@ class Kay(commands.Cog):
             message = await channel.fetch_message(message_id)
 
             # Create the embed object
-            embed = Embed(title="Reaction added", color=0xFFC0CB)
+            embed = Embed(title="Reaction added", color=0xE91E63)
             embed.add_field(name="User", value=user.mention, inline=False)
             embed.add_field(name="Message", value=message.jump_url, inline=False)
             embed.add_field(name="Emoji", value=str(emoji), inline=False)
