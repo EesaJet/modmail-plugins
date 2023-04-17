@@ -8,7 +8,7 @@ class Kay(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.log_channel_id = 1050914082083053650  # Replace with the ID of the log channel
-        self.monitored_channel_id = 466682606373830657  # Replace with the ID of the channel to monitor
+        self.monitored_channel_ids = [466682606373830657, 455404878202798100, 773002648743706634]  # Replace with the IDs of the channels to monitor
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -29,7 +29,7 @@ class Kay(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
-        if payload.channel_id == self.monitored_channel_id:
+        if payload.channel_id in self.monitored_channel_ids:
             # Get the relevant information
             user_id = payload.user_id
             message_id = payload.message_id
