@@ -6,7 +6,7 @@ class Kay(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.log_channel_id = 1094052707507122176  # Replace with the ID of the log channel
+        self.log_channel_id = 1050914082083053650  # Replace with the ID of the log channel
         self.monitored_channel_id = 466682606373830657  # Replace with the ID of the channel to monitor
 
     @commands.Cog.listener()
@@ -34,8 +34,10 @@ class Kay(commands.Cog):
             message_id = payload.message_id
             emoji = payload.emoji
 
-            # Get the user and the message objects
+            # Get the user, member and message objects
+            guild = self.bot.get_guild(payload.guild_id)
             user = await self.bot.fetch_user(user_id)
+            member = guild.get_member(user_id)
             channel = await self.bot.fetch_channel(payload.channel_id)
             message = await channel.fetch_message(message_id)
 
@@ -44,6 +46,7 @@ class Kay(commands.Cog):
             embed.add_field(name="User", value=user.mention, inline=False)
             embed.add_field(name="Message", value=message.jump_url, inline=False)
             embed.add_field(name="Emoji", value=str(emoji), inline=False)
+            embed.set_thumbnail(url=member.avatar_url)
 
             # Send the embed to the log channel
             log_channel = await self.bot.fetch_channel(self.log_channel_id)
