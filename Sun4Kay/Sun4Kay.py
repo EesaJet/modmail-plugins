@@ -47,8 +47,7 @@ class Kay(commands.Cog):
             embed.add_field(name="User", value=user.mention, inline=False)
             embed.add_field(name="Message", value=message.jump_url, inline=False)
             embed.add_field(name="Emoji", value=str(emoji), inline=False)
-            embed.set_thumbnail(url=user.avatar_url)
-
+            
             # Send the embed to the log channel
             log_channel = await self.bot.fetch_channel(self.log_channel_id)
             await log_channel.send(embed=embed)
