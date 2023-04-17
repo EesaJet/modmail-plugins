@@ -34,7 +34,7 @@ class Kay(commands.Cog):
             user_id = payload.user_id
             message_id = payload.message_id
             emoji = payload.emoji
-            event_time = payload.event_time
+            event_time = datetime.utcfromtimestamp(payload.event_time)
 
             # Get the user, member and message objects
             guild = self.bot.get_guild(payload.guild_id)
@@ -42,16 +42,13 @@ class Kay(commands.Cog):
             member = guild.get_member(user_id)
             channel = await self.bot.fetch_channel(payload.channel_id)
             message = await channel.fetch_message(message_id)
-            
-            # Format the timestamp
-            timestamp = event_time.strftime("%Y-%m-%d %H:%M:%S")
 
             # Create the embed object
             embed = Embed(title="Reaction added", color=0xFFD700)
             embed.add_field(name="User", value=user.mention, inline=False)
             embed.add_field(name="Message", value=message.jump_url, inline=False)
             embed.add_field(name="Emoji", value=str(emoji), inline=False)
-            embed.add_field(name="Timestamp", value=timestamp, inline=False)
+            embed.add_field(name="Timestamp", value=event_time.strftime("%Y-%m-%d %H:%M:%S"), inline=False)
             embed.set_thumbnail(url=user.avatar_url)
 
             # Send the embed to the log channel
