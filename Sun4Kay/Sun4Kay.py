@@ -1,5 +1,5 @@
-from discord import Embed
 from datetime import datetime
+from discord import Embed
 from discord.ext import commands
 
 class Kay(commands.Cog):
@@ -7,8 +7,8 @@ class Kay(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.log_channel_id = 1050914082083053650  # Replace with the ID of the log channel
-        self.monitored_channel_id = 466682606373830657  # Replace with the ID of the channel to monitor
+        self.log_channel_id = 1234567890  # Replace with the ID of the log channel
+        self.monitored_channel_id = 9876543210  # Replace with the ID of the channel to monitor
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -26,7 +26,7 @@ class Kay(commands.Cog):
         if "BREAKDATE" in message.content.upper() and not message.author.bot:
             await message.channel.send("ROTOXIC HAVE DONE A BREAKDATE! :boom:")
             await message.channel.send("https://tenor.com/view/roblox-developer-crash-gif-24842627")
-            
+
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         if payload.channel_id == self.monitored_channel_id:
