@@ -7,8 +7,8 @@ class Kay(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.log_channel_id = 1234567890  # Replace with the ID of the log channel
-        self.monitored_channel_id = 9876543210  # Replace with the ID of the channel to monitor
+        self.log_channel_id = 1050914082083053650  # Replace with the ID of the log channel
+        self.monitored_channel_id = 466682606373830657  # Replace with the ID of the channel to monitor
 
     @commands.Cog.listener()
     async def on_message(self, message):
