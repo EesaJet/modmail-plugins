@@ -1,3 +1,4 @@
+from discord import Embed
 from discord.ext import commands
 
 class Kay(commands.Cog):
@@ -5,6 +6,8 @@ class Kay(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.log_channel_id = 1094052707507122176  # Replace with the ID of the log channel
+        self.monitored_channel_id = 466682606373830657  # Replace with the ID of the channel to monitor
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -22,6 +25,29 @@ class Kay(commands.Cog):
         if "BREAKDATE" in message.content.upper() and not message.author.bot:
             await message.channel.send("ROTOXIC HAVE DONE A BREAKDATE! :boom:")
             await message.channel.send("https://tenor.com/view/roblox-developer-crash-gif-24842627")
+            
+    @commands.Cog.listener()
+    async def on_raw_reaction_add(self, payload):
+        if payload.channel_id == self.monitored_channel_id:
+            # Get the relevant information
+            user_id = payload.user_id
+            message_id = payload.message_id
+            emoji = payload.emoji
+
+            # Get the user and the message objects
+            user = await self.bot.fetch_user(user_id)
+            channel = await self.bot.fetch_channel(payload.channel_id)
+            message = await channel.fetch_message(message_id)
+
+            # Create the embed object
+            embed = Embed(title="Reaction added", color=0xFFD700)
+            embed.add_field(name="User", value=user.mention, inline=False)
+            embed.add_field(name="Message", value=message.jump_url, inline=False)
+            embed.add_field(name="Emoji", value=str(emoji), inline=False)
+
+            # Send the embed to the log channel
+            log_channel = await self.bot.fetch_channel(self.log_channel_id)
+            await log_channel.send(embed=embed)
 
 async def setup(bot):
     await bot.add_cog(Kay(bot))
