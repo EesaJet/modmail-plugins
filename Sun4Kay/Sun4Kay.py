@@ -15,8 +15,10 @@ class Kay(commands.Cog):
       
         exempt_words = ["SUNDAY", "SUNBURY"]
       
+        if message.author.id == 259143946150739969:
+            await message.add_reaction("🌸")
         if "KAY" in message.content.upper() and not message.author.bot:
-            await message.add_reaction("KAYA:813843744385269762")
+            await message.add_reaction("🌸")
         if "SUN" in message.content.upper() and not message.author.bot and all(exemption not in message.content.upper() for exemption in exempt_words):
             await message.channel.send("Here comes the sun!")
             await message.channel.send("<a:KayA:813843744385269762>")
@@ -55,3 +57,5 @@ class Kay(commands.Cog):
 
 async def setup(bot):
     await bot.add_cog(Kay(bot))
+    
+#KAYA:813843744385269762
