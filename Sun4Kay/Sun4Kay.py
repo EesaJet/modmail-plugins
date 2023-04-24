@@ -1,6 +1,7 @@
 from datetime import datetime
 from discord import Embed
 from discord.ext import commands
+import discord
 
 class Kay(commands.Cog):
     """Reacts with a banana emoji if someone says banana."""
