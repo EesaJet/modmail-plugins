@@ -11,6 +11,7 @@ class Eesa(commands.Cog):
         self.bot = bot
         self.timer_file = "timers.json"
         self.timers = self.load_timers()
+        self.role_ids = [1002600411099828326, 455190182623313940] # Replace with your desired role IDs
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -34,6 +35,14 @@ class Eesa(commands.Cog):
             await message.add_reaction("🌸")
         elif "MIKE" in message.content.upper():
             await message.add_reaction("CANTERBURY:1097286182527828109")
+            
+    @commands.Cog.listener()
+    async def on_member_join(self, member: discord.Member):
+        guild = member.guild
+        for role_id in self.role_ids:
+            role = guild.get_role(role_id)
+            if role is not None:
+                await member.add_roles(role)
 
     @commands.command()
     async def say(self, ctx, *, message):
