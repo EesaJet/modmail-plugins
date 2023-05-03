@@ -1,6 +1,8 @@
 from datetime import datetime
 from discord import Embed
 from discord.ext import commands
+from discord_slash import SlashContext, cog_ext
+from discord_slash.utils import manage_commands
 import discord
 
 class Kay(commands.Cog):
@@ -58,6 +60,11 @@ class Kay(commands.Cog):
             # Send the embed to the log channel
             log_channel = await self.bot.fetch_channel(self.log_channel_id)
             await log_channel.send(embed=embed)
+            
+    @commands.slash_command(name="cake", description="Sends a cake to a user.")
+    async def send_cake(self, ctx: SlashContext, user: discord.Member):
+        message = f"**{user.mention}, you have been CAKED!** 🎂"
+        await ctx.channel.send(message)
             
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
