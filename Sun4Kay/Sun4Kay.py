@@ -61,7 +61,7 @@ class Kay(commands.Cog):
             log_channel = await self.bot.fetch_channel(self.log_channel_id)
             await log_channel.send(embed=embed)
             
-    @commands.slash_command(name="cake", description="Sends a cake to a user.")
+    @commands.slash_command(name="cakemember", description="Sends a cake to a user.")
     async def send_cake(self, ctx: SlashContext, user: discord.Member):
         message = f"**{user.mention}, you have been CAKED!** 🎂"
         await ctx.channel.send(message)
