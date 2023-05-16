@@ -30,7 +30,8 @@ class Eesa(commands.Cog):
             # Check if the message counter is a multiple of 5
             if message_counter[specified_chat_id] % 5 == 0:
                 # Post a specific message
-                await message.channel.send("This is the 5th message in this chat!")
+                channel = self.bot.get_channel(specified_chat_id)
+                await channel.send("This is the 5th message in this chat!")
         
         if "EESA" in message.content.upper():
             await message.add_reaction("✈️")
