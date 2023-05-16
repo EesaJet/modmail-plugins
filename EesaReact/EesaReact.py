@@ -11,9 +11,27 @@ class Eesa(commands.Cog):
         self.bot = bot
         self.timer_file = "timers.json"
         self.timers = self.load_timers()
+        
+    message_counter = {}
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        # Get the channel ID of the specified chat
+        specified_chat_id = "1079457518788554772"
+
+        # Check if the message is in the specified chat
+        if message.channel.id == specified_chat_id:
+            # Increase the message counter for the chat
+            if specified_chat_id not in message_counter:
+                message_counter[specified_chat_id] = 1
+            else:
+                message_counter[specified_chat_id] += 1
+
+            # Check if the message counter is a multiple of 5
+            if message_counter[specified_chat_id] % 5 == 0:
+                # Post a specific message
+                await message.channel.send("This is the 5th message in this chat!")
+        
         if "EESA" in message.content.upper():
             await message.add_reaction("✈️")
         elif "SHIT" in message.content.upper():
