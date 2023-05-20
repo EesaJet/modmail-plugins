@@ -26,7 +26,7 @@ class Eesa(commands.Cog):
              async for _ in message.channel.history(limit=None):
                  message_count += 1
 
-             target_message_count = random.randint(1, 20)  # Choose a random number between 1 and 20
+             target_message_count = random.randint(1, 2)  # Choose a random number between 1 and 20
 
              if message_count == target_message_count:
                  channel = message.channel
