@@ -16,6 +16,18 @@ class Eesa(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        
+        # Existing code for reactions
+
+        # Check if the message count has reached the specified number
+        if message.guild:
+            message_count = len(await message.channel.history().flatten())
+            target_message_count = random.randint(1, 2)  # Choose a random number between 1 and 20
+
+            if message_count == target_message_count:
+                channel = message.channel
+                await channel.send("This is the special message!")  # Replace with your desired message
+        
         if "EESA" in message.content.upper():
             await message.add_reaction("✈️")
         elif "SHIT" in message.content.upper():
