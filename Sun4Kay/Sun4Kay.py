@@ -18,11 +18,11 @@ class Kay(commands.Cog):
         exempt_words = ["SUNDAY", "SUNBURY"]
       
         if message.author.id == 259143946150739969:
-            await message.add_reaction("🌸")
+            await message.add_reaction("🔮")
         if message.author.id == 303491008119832577:
-            await message.add_reaction("✈️")
+            await message.add_reaction("🛸")
         if "KAY" in message.content.upper() and not message.author.bot:
-            await message.add_reaction("🌸")
+            await message.add_reaction("🔮")
         if "HALLOWEEN" in message.content.upper() and not message.author.bot and all(exemption not in message.content.upper() for exemption in exempt_words):
             await message.channel.send("Pumpkin pie anyone?")
             await message.channel.send("🎃🩸🥧")
