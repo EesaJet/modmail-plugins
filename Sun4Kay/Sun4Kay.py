@@ -23,6 +23,9 @@ class Kay(commands.Cog):
             await message.add_reaction("✈️")
         if "KAY" in message.content.upper() and not message.author.bot:
             await message.add_reaction("🌸")
+        if "HALLOWEEN" in message.content.upper() and not message.author.bot and all(exemption not in message.content.upper() for exemption in exempt_words):
+            await message.channel.send("Pumpkin pie anyone?")
+            await message.channel.send("🎃🩸🥧")
         if "SUN" in message.content.upper() and not message.author.bot and all(exemption not in message.content.upper() for exemption in exempt_words):
             await message.channel.send("Here comes the sun!")
             await message.channel.send("<a:KayA:813843744385269762>")
