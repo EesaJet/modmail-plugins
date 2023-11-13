@@ -26,8 +26,6 @@ class Eesa(commands.Cog):
             await message.add_reaction("⛵")
         elif "PHOTO" in message.content.upper():
             await message.add_reaction("📸")
-        elif "JAY" in message.content.upper():
-            await message.add_reaction("OLDMAN:1080268375911059517")
         elif "ETHAN" in message.content.upper():
             await message.add_reaction("KNIGHT:1080268333976391780")
         elif "DAFFY" in message.content.upper():
