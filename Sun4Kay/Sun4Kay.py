@@ -16,16 +16,15 @@ class Kay(commands.Cog):
     async def on_message(self, message):
       
         exempt_words = ["SUNDAY", "SUNBURY"]
-      
-        if message.author.id == 259143946150739969:
-            await message.add_reaction("🌸")
-        if message.author.id == 303491008119832577:
-            await message.add_reaction("✈")
+        
         if "KAY" in message.content.upper() and not message.author.bot:
-            await message.add_reaction("<a:KayA:813843744385269762>")
+            await message.add_reaction("🌸)
         if "HALLOWEEN" in message.content.upper() and not message.author.bot and all(exemption not in message.content.upper() for exemption in exempt_words):
             await message.channel.send("Pumpkin pie anyone?")
             await message.channel.send("🎃🩸🥧")
+        if "CHRISTMAS" in message.content.upper() and not message.author.bot:
+            await message.channel.send("Do they know it's Christmas time at all?")
+            await message.channel.send("https://tenor.com/view/christmas-lights-merry-christmas-happy-xmas-christmas-tree-sparkle-gif-10534722")
         if "SUN" in message.content.upper() and not message.author.bot and all(exemption not in message.content.upper() for exemption in exempt_words):
             await message.channel.send("Here comes the sun!")
             await message.channel.send("<a:KayA:813843744385269762>")
