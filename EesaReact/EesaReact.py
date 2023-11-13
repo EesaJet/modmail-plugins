@@ -32,8 +32,6 @@ class Eesa(commands.Cog):
             await message.add_reaction("KNIGHT:1080268333976391780")
         elif "DAFFY" in message.content.upper():
             await message.add_reaction("👑")
-        elif "MICHAEL" in message.content.upper():
-            await message.add_reaction("🏅")
         elif "SHANIE" in message.content.upper():
             await message.add_reaction("🌸")
         elif "MIKE" in message.content.upper():
