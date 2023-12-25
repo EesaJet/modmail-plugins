@@ -19,12 +19,6 @@ class Kay(commands.Cog):
         
         if "KAY" in message.content.upper() and not message.author.bot:
             await message.add_reaction("🌸")
-        if "HALLOWEEN" in message.content.upper() and not message.author.bot and all(exemption not in message.content.upper() for exemption in exempt_words):
-            await message.channel.send("Pumpkin pie anyone?")
-            await message.channel.send("🎃🩸🥧")
-        if "CHRISTMAS" in message.content.upper() and not message.author.bot:
-            await message.channel.send("Do they know it's Christmas time at all?")
-            await message.channel.send("https://tenor.com/view/christmas-lights-merry-christmas-happy-xmas-christmas-tree-sparkle-gif-10534722")
         if "SUN" in message.content.upper() and not message.author.bot and all(exemption not in message.content.upper() for exemption in exempt_words):
             await message.channel.send("Here comes the sun!")
             await message.channel.send("<a:KayA:813843744385269762>")
@@ -34,7 +28,9 @@ class Kay(commands.Cog):
         if "BREAKDATE" in message.content.upper() and not message.author.bot:
             await message.channel.send("ROTOXIC HAVE DONE A BREAKDATE! :boom:")
             await message.channel.send("https://tenor.com/view/roblox-developer-crash-gif-24842627")
-
+        if "STUDIO" in message.content.upper() and not message.author.bot:
+            await message.channel.send("\"Fucking Studio 😡\" ~ Kay 2024")
+            
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         if payload.channel_id in self.monitored_channel_ids:
