@@ -502,52 +502,58 @@ class ModerationLogging:
         )
 
     async def on_raw_message_delete(self, payload: discord.RawMessageDeleteEvent) -> None:
-        if not payload.guild_id:
-            return
-        guild = self.bot.get_guild(payload.guild_id)
-        if not guild or not self.is_enabled(guild):
-            return
+    if not payload.guild_id:
+        return
+    guild = self.bot.get_guild(payload.guild_id)
+    if not guild or not self.is_enabled(guild):
+        return
 
-        channel = guild.get_channel(payload.channel_id)
-        if channel is None or self.is_whitelisted(guild, channel):
-            return
+    channel = guild.get_channel(payload.channel_id)
+    if channel is None or self.is_whitelisted(guild, channel):
+        return
 
-        ignored_channel_ids = [455207881747464192, 937999681915604992]
-        message = payload.cached_message
-        if message and message.author.bot and message.channel.id not in ignored_channel_ids:
-            return
+    ignored_channel_ids = [455207881747464192, 937999681915604992]
+    message = payload.cached_message
+    if message and message.author.bot and message.channel.id not in ignored_channel_ids:
+        return
 
-        action = "message deleted"
-        embed = discord.Embed(
-            color=action_colors.get(action, action_colors["normal"]),
-            timestamp=discord.utils.utcnow(),
+    action = "message deleted"
+    embed = discord.Embed(
+        color=action_colors.get(action, action_colors["normal"]),
+        timestamp=discord.utils.utcnow(),
+    )
+    if message:
+        content = f"`{message.content}`"
+        info = (
+            f"Sent by: {message.author.mention}\n"
+            f"Message sent on: {discord.utils.format_dt(message.created_at)}\n"
         )
-        if message:
-            content = f"`{message.content}`"
-            info = (
-                f"Sent by: {message.author.mention}\n"
-                f"Message sent on: {discord.utils.format_dt(message.created_at)}\n"
-            )
-            embed.add_field(name="Message info", value=info)
-            footer_text = f"Message ID: {message.id}\nChannel ID: {message.channel.id}"
-        else:
-            content = None
-            footer_text = f"Message ID: {payload.message_id}\nChannel ID: {payload.channel_id}"
+        embed.add_field(name="Message info", value=info)
 
-        embed.description = f"**Message deleted in {channel.mention}:**\n"
-        if content:
-            embed.description += truncate(content, Limit.embed_description - len(embed.description))
-        else:
-            embed.description = f":hand_splayed: Message deleted in {channel.mention}, however the message is too old for its contents to be retrieved.\n"
-            embed.set_footer(text=footer_text)
-        if channel.id in ignored_channel_ids:
-            embed.description = ":exclamation: A Director or member of SMT has deleted a message from this channel. Please review the main server audit logs to find the user who deleted the message."
+        # Check for attachments and add them to the embed
+        if message.attachments:
+            attachment_urls = "\n".join(attachment.url for attachment in message.attachments)
+            embed.add_field(name="Attachments", value=attachment_urls, inline=False)
 
-        await self.send_log(
-            guild,
-            action=action,
-            embed=embed,
-        )
+        footer_text = f"Message ID: {message.id}\nChannel ID: {message.channel.id}"
+    else:
+        content = None
+        footer_text = f"Message ID: {payload.message_id}\nChannel ID: {payload.channel_id}"
+
+    embed.description = f"**Message deleted in {channel.mention}:**\n"
+    if content:
+        embed.description += truncate(content, Limit.embed_description - len(embed.description))
+    else:
+        embed.description = f":hand_splayed: Message deleted in {channel.mention}, however the message is too old for its contents to be retrieved.\n"
+        embed.set_footer(text=footer_text)
+    if channel.id in ignored_channel_ids:
+        embed.description = ":exclamation: A Director or member of SMT has deleted a message from this channel. Please review the main server audit logs to find the user who deleted the message."
+
+    await self.send_log(
+        guild,
+        action=action,
+        embed=embed,
+    )
 
     async def on_raw_bulk_message_delete(self, payload: discord.RawBulkMessageDeleteEvent) -> None:
         if not payload.guild_id:
