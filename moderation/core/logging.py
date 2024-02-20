@@ -523,7 +523,10 @@ class ModerationLogging:
             timestamp=discord.utils.utcnow(),
         )
         if message:
-            content = f"`{message.content}`"
+            if message.content:
+                content = f"`{message.content}`"
+            else:
+                content = "No message text - see attachments"
             info = (
                 f"Sent by: {message.author.mention}\n"
                 f"Message sent on: {discord.utils.format_dt(message.created_at)}\n"
