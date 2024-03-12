@@ -12,6 +12,7 @@ class Ethan(commands.Cog):
     async def on_message(self, message):
         if message.channel.id == 455404878202798100 and "Start date:" in message.content and "Return date:" in message.content:
             # Send a message to prompt you to react
+            print("Bot detected a valid message in the specified channel.")
             prompt_message = await message.channel.send("React with ✅ to confirm.")
             await prompt_message.add_reaction("✅")
 
@@ -20,11 +21,13 @@ class Ethan(commands.Cog):
                 return user == message.author and str(reaction.emoji) == "✅"
             
             try:
+                print("Bot is waiting for your reaction...")
                 reaction, user = await self.bot.wait_for("reaction_add", timeout=10.0, check=check)
             except asyncio.TimeoutError:
-                await message.channel.send("You didn't react in time. Aborting.")
+                print("You didn't react in time. Aborting.")
                 return
             
+            print("You reacted with ✅. Continuing with role assignment...")
             start_date = None
             return_date = None
             lines = message.content.split('\n')
@@ -36,21 +39,26 @@ class Ethan(commands.Cog):
             
             current_date = datetime.datetime.now()
             if start_date <= current_date <= return_date:
+                print("Current date is within the specified range. Assigning role...")
                 user = message.author
                 guild = message.guild
-                role = discord.utils.get(guild.roles, id=570024555595169813)
+                role = discord.utils.get(guild.roles, id=570024555595169813)  # Your role ID
                 await user.add_roles(role)
                 
                 await self.schedule_role_removal(user, role, return_date)
+            else:
+                print("Current date is not within the specified range. Role assignment skipped.")
 
         if "ETHAN" in message.content.upper():
-            await message.add_reaction("KNIGHT:1080268333976391780")
+            await message.add_reaction("🍌")
+            print("Bot reacted with 🍌 to message containing 'ETHAN'.")
 
     async def schedule_role_removal(self, user, role, return_date):
         while True:
             current_date = datetime.datetime.now()
             if current_date >= return_date:
                 await user.remove_roles(role)
+                print(f"Role {role.name} removed from {user.name} as return date has passed.")
                 break
             else:
                 await asyncio.sleep(60)
