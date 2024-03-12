@@ -20,7 +20,7 @@ class Ethan(commands.Cog):
                 return user == message.author and str(reaction.emoji) == "✅"
             
             try:
-                reaction, user = await self.bot.wait_for("reaction_add", timeout=60.0, check=check)
+                reaction, user = await self.bot.wait_for("reaction_add", timeout=10.0, check=check)
             except asyncio.TimeoutError:
                 await message.channel.send("You didn't react in time. Aborting.")
                 return
