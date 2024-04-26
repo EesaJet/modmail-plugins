@@ -95,6 +95,11 @@ class Eesa(commands.Cog):
         elapsed_time_str = f"{hours} Hours {minutes} Minutes {seconds} Seconds"
         await ctx.send(f"Elapsed time: {elapsed_time_str}")
 
+    @commands.command()
+    async def DM(self, ctx, user: discord.User, *, message: str):
+        """Sends a direct message to the specified user."""
+        await user.send(message)
+        await ctx.send(f"Sent a message to {user.name}.")
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
