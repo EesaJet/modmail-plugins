@@ -96,7 +96,7 @@ class Eesa(commands.Cog):
         await ctx.send(f"Elapsed time: {elapsed_time_str}")
 
     @commands.command()
-    async def DM(self, ctx, user: discord.User, *, message: str):
+    async def dm(self, ctx, user: discord.User, *, message: str):
         """Sends a direct message to the specified user."""
         await user.send(message)
         await ctx.send(f"Sent a message to {user.name}.")
