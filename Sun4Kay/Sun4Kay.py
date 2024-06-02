@@ -31,7 +31,7 @@ class Kay(commands.Cog):
             await message.channel.send("\"Fucking Studio 😡\" ~ Kay 2024")
 
         # Check if the message is in the shift notifications channel
-        if message.channel.id == self.shift_notifications_channel_id:
+        if message.channel.id == self.shift_notifications_channel_id and not message.author.bot:
             role = message.guild.get_role(self.shift_notifications_role_id)
             if role:
                 await message.channel.send(f"{role.mention}")
