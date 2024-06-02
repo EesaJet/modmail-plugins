@@ -1,4 +1,4 @@
-from discord import Embed
+from discord import Embed, Webhook
 from discord.ext import commands
 
 class Kay(commands.Cog):
@@ -30,11 +30,17 @@ class Kay(commands.Cog):
         if "STUDIO" in message.content.upper() and not message.author.bot:
             await message.channel.send("\"Fucking Studio 😡\" ~ Kay 2024")
 
-        # Check if the message is in the shift notifications channel
-        if message.channel.id == self.shift_notifications_channel_id and not message.author.bot:
-            role = message.guild.get_role(self.shift_notifications_role_id)
-            if role:
-                await message.channel.send(f"{role.mention}")
+    @commands.Cog.listener()
+    async def on_webhooks_update(self, channel):
+        if channel.id in self.monitored_channel_ids:
+            # Fetch the latest message in the channel
+            async for message in channel.history(limit=1):
+                if message.webhook_id:
+                    # Check if the message is in the shift notifications channel
+                    if message.channel.id == self.shift_notifications_channel_id and not message.author.bot:
+                        role = message.guild.get_role(self.shift_notifications_role_id)
+                        if role:
+                            await message.channel.send(f"{role.mention}")
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
