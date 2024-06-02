@@ -11,7 +11,7 @@ class Kay(commands.Cog):
         self.log_channel_id = 1050914082083053650  # Replace with the ID of the log channel
         self.monitored_channel_ids = [466682606373830657, 455404878202798100, 773002648743706634]  # Replace with the IDs of the channels to monitor
         self.role_ids = [1002600411099828326, 455190182623313940] # Replace with your desired role IDs
-        self.shift_notifications_role_id = 455194046957355010  # Role ID for Shift Notifications
+        self.shift_notifications_role_id = 1237844151525969930  # Role ID for Shift Notifications
         self.last_tag_time = datetime.now() - timedelta(minutes=2)  # Initialize last tag time
         
     @commands.Cog.listener()
