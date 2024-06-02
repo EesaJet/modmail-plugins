@@ -1,7 +1,5 @@
-from datetime import datetime
 from discord import Embed
 from discord.ext import commands
-import discord
 
 class Kay(commands.Cog):
     """Reacts with a banana emoji if someone says banana."""
@@ -11,10 +9,11 @@ class Kay(commands.Cog):
         self.log_channel_id = 1050914082083053650  # Replace with the ID of the log channel
         self.monitored_channel_ids = [466682606373830657, 455404878202798100, 773002648743706634]  # Replace with the IDs of the channels to monitor
         self.role_ids = [1002600411099828326, 455190182623313940] # Replace with your desired role IDs
+        self.shift_notifications_channel_id = 550791497880961047  # ID of the channel to monitor for shift notifications
+        self.shift_notifications_role_id = 455194046957355010  # Replace with the ID of the @Shift Notifications role
 
     @commands.Cog.listener()
     async def on_message(self, message):
-      
         exempt_words = ["SUNDAY", "SUNBURY"]
         
         if "KAY" in message.content.upper() and not message.author.bot:
@@ -30,7 +29,13 @@ class Kay(commands.Cog):
             await message.channel.send("https://tenor.com/view/roblox-developer-crash-gif-24842627")
         if "STUDIO" in message.content.upper() and not message.author.bot:
             await message.channel.send("\"Fucking Studio 😡\" ~ Kay 2024")
-            
+
+        # Check if the message is in the shift notifications channel
+        if message.channel.id == self.shift_notifications_channel_id:
+            role = message.guild.get_role(self.shift_notifications_role_id)
+            if role:
+                await message.channel.send(f"{role.mention}")
+
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         if payload.channel_id in self.monitored_channel_ids:
@@ -58,7 +63,7 @@ class Kay(commands.Cog):
             await log_channel.send(embed=embed)
             
     @commands.Cog.listener()
-    async def on_member_join(self, member: discord.Member):
+    async def on_member_join(self, member):
         guild = member.guild
         for role_id in self.role_ids:
             role = guild.get_role(role_id)
@@ -67,5 +72,3 @@ class Kay(commands.Cog):
 
 async def setup(bot):
     await bot.add_cog(Kay(bot))
-    
-#KAYA:813843744385269762
