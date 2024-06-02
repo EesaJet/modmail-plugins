@@ -18,7 +18,7 @@ class Kay(commands.Cog):
     async def on_message(self, message):
         exempt_words = ["SUNDAY", "SUNBURY"]
 
-        if message.channel.id == 550791497880961047 and not message.author.bot:
+        if message.channel.id == 550791497880961047:
             # Check if it's been more than 2 minutes since last tag
             if datetime.now() - self.last_tag_time >= timedelta(minutes=2):
                 role = message.guild.get_role(self.shift_notifications_role_id)
