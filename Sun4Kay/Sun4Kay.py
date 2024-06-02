@@ -24,8 +24,8 @@ async def on_message(self, message):
             # Check if the message is an embed
             if isinstance(message, discord.Message) and message.embeds:
                 for embed in message.embeds:
-                    # Check if the word "shift" is in the embed's fields or description
-                    if "shift" in embed.description.lower() or any("shift" in field.value.lower() for field in embed.fields):
+                    # Check if the word "shift" is in the embed's title
+                    if "shift" in embed.title.lower():
                         role = message.guild.get_role(self.shift_notifications_role_id)
                         if role:
                             await message.channel.send(role.mention)
@@ -46,6 +46,7 @@ async def on_message(self, message):
         await message.channel.send("https://tenor.com/view/roblox-developer-crash-gif-24842627")
     if "STUDIO" in message.content.upper() and not message.author.bot:
         await message.channel.send("\"Fucking Studio 😡\" ~ Kay 2024")
+
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
