@@ -12,7 +12,7 @@ class Kay(commands.Cog):
         self.monitored_channel_ids = [466682606373830657, 455404878202798100, 773002648743706634]  # Replace with the IDs of the channels to monitor
         self.role_ids = [1002600411099828326, 455190182623313940] # Replace with your desired role IDs
         self.shift_notifications_role_id = 1237844151525969930  # Role ID for Shift Notifications
-        self.last_tag_time = datetime.now() - timedelta(minutes=2)  # Initialize last tag time
+        self.last_tag_time = datetime.now() - timedelta(minutes=90)  # Initialize last tag time
         
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -20,7 +20,7 @@ class Kay(commands.Cog):
     
         if message.channel.id == 550791497880961047 and message.author.id == 1233898948100362321:
             # Check if it's been more than 2 minutes since last tag
-            if datetime.now() - self.last_tag_time >= timedelta(minutes=2):
+            if datetime.now() - self.last_tag_time >= timedelta(minutes=90):
                 role = message.guild.get_role(self.shift_notifications_role_id)
                 if role:
                     await message.channel.send(role.mention)
