@@ -18,19 +18,13 @@ class Kay(commands.Cog):
 async def on_message(self, message):
     exempt_words = ["SUNDAY", "SUNBURY"]
 
-    if message.channel.id == 550791497880961047 and not message.author.bot:
+    if message.channel.id == 550791497880961047 and message.author.name == "Quality Line Group Shouts":
         # Check if it's been more than 2 minutes since last tag
         if datetime.now() - self.last_tag_time >= timedelta(minutes=2):
-            # Check if the message is an embed
-            if isinstance(message, discord.Message) and message.embeds:
-                for embed in message.embeds:
-                    # Check if the word "shift" is in the embed's title
-                    if "shift" in embed.title.lower():
-                        role = message.guild.get_role(self.shift_notifications_role_id)
-                        if role:
-                            await message.channel.send(role.mention)
-                            self.last_tag_time = datetime.now()
-                            break  # Stop checking further embeds once the role is tagged
+            role = message.guild.get_role(self.shift_notifications_role_id)
+            if role:
+                await message.channel.send(role.mention)
+                self.last_tag_time = datetime.now()
 
     if "KAY" in message.content.upper() and not message.author.bot:
         await message.add_reaction("🌸")
@@ -46,7 +40,6 @@ async def on_message(self, message):
         await message.channel.send("https://tenor.com/view/roblox-developer-crash-gif-24842627")
     if "STUDIO" in message.content.upper() and not message.author.bot:
         await message.channel.send("\"Fucking Studio 😡\" ~ Kay 2024")
-
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
