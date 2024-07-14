@@ -1,4 +1,4 @@
-from discord.ext import commands
+from discord.ext import commands, tasks
 from datetime import datetime, timedelta
 import pytz
 import math
@@ -14,6 +14,8 @@ class Eesa(commands.Cog):
         self.timers = self.load_timers()
         self.deadline_message_id = None
         self.channel_id = 466682606373830657
+        self.deadline = self.get_next_monday_midnight()
+        self.check_deadline.start()
 
     message_counter = {}
 
@@ -45,11 +47,24 @@ class Eesa(commands.Cog):
         return next_monday_midnight
 
     async def post_deadline_message(self, channel):
-        deadline = self.get_next_monday_midnight()
-        unix_timestamp = int(deadline.timestamp())
-        message_content = f"The deadline is <t:{unix_timestamp}:R>."
+        self.deadline = self.get_next_monday_midnight()
+        unix_timestamp = int(self.deadline.timestamp())
+        message_content = f"The deadline to submit any activity this week is <t:{unix_timestamp}:R>."
         message = await channel.send(message_content)
         self.deadline_message_id = message.id
+
+    @tasks.loop(minutes=1)
+    async def check_deadline(self):
+        now = datetime.now(pytz.timezone('Europe/London'))
+        if now >= self.deadline:
+            channel = self.bot.get_channel(self.channel_id)
+            if channel and self.deadline_message_id:
+                try:
+                    message = await channel.fetch_message(self.deadline_message_id)
+                    await message.edit(content="Activity submissions for the week closed.")
+                except discord.NotFound:
+                    pass
+            self.deadline_message_id = None  # Reset the message ID
 
     @commands.Cog.listener()
     async def on_message(self, message):
