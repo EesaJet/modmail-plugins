@@ -46,7 +46,8 @@ class Eesa(commands.Cog):
 
     async def post_deadline_message(self, channel):
         deadline = self.get_next_monday_midnight()
-        message_content = f"The deadline is {deadline.strftime('%Y-%m-%d %H:%M:%S %Z')}."
+        unix_timestamp = int(deadline.timestamp())
+        message_content = f"The deadline is <t:{unix_timestamp}:R>."
         message = await channel.send(message_content)
         self.deadline_message_id = message.id
 
