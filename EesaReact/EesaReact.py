@@ -1,40 +1,21 @@
 from discord.ext import commands
 from datetime import datetime, timedelta
+import pytz
 import math
 import json
-import random
 import discord
 
 class Eesa(commands.Cog):
-    """Reacts with a banana emoji if someone says banana."""
+    """Reacts with specific emojis and manages deadlines."""
 
     def __init__(self, bot):
         self.bot = bot
         self.timer_file = "timers.json"
         self.timers = self.load_timers()
-        
+        self.deadline_message_id = None
+        self.channel_id = 466682606373830657
+
     message_counter = {}
-
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        
-        if "EESA" in message.content.upper():
-            await message.add_reaction("✈️")
-        elif "SHIT" in message.content.upper():
-            await message.add_reaction("💩")
-        elif "DAFFY" in message.content.upper():
-            await message.add_reaction("👑")
-        elif "SHANIE" in message.content.upper():
-            await message.add_reaction("🌸")
-        elif "MIKE" in message.content.upper():
-            await message.add_reaction("CANTERBURY:1097286182527828109")
-        elif "JONATHAN" in message.content.upper():
-            await message.add_reaction("JONATHAN:1080274489465651283")
-
-    @commands.command()
-    async def say(self, ctx, *, message):
-        await ctx.send(message)
-        await ctx.message.delete()
 
     def load_timers(self):
         try:
@@ -53,6 +34,53 @@ class Eesa(commands.Cog):
         timers = {str(user_id): timestamp.isoformat() for user_id, timestamp in self.timers.items()}
         with open(self.timer_file, "w") as f:
             json.dump(timers, f)
+
+    def get_next_monday_midnight(self):
+        now = datetime.now(pytz.timezone('Europe/London'))
+        days_ahead = 0 - now.weekday() + 7  # Calculate days until next Monday
+        if days_ahead <= 0:  # If today is Monday or later in the week, add 7 days
+            days_ahead += 7
+        next_monday = now + timedelta(days=days_ahead)
+        next_monday_midnight = next_monday.replace(hour=0, minute=0, second=0, microsecond=0)
+        return next_monday_midnight
+
+    async def post_deadline_message(self, channel):
+        deadline = self.get_next_monday_midnight()
+        message_content = f"The deadline is {deadline.strftime('%Y-%m-%d %H:%M:%S %Z')}."
+        message = await channel.send(message_content)
+        self.deadline_message_id = message.id
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.author == self.bot.user:
+            return
+
+        if "EESA" in message.content.upper():
+            await message.add_reaction("✈️")
+        elif "SHIT" in message.content.upper():
+            await message.add_reaction("💩")
+        elif "DAFFY" in message.content.upper():
+            await message.add_reaction("👑")
+        elif "SHANIE" in message.content.upper():
+            await message.add_reaction("🌸")
+        elif "MIKE" in message.content.upper():
+            await message.add_reaction("CANTERBURY:1097286182527828109")
+        elif "JONATHAN" in message.content.upper():
+            await message.add_reaction("JONATHAN:1080274489465651283")
+
+        if message.channel.id == self.channel_id:
+            if self.deadline_message_id:
+                try:
+                    old_message = await message.channel.fetch_message(self.deadline_message_id)
+                    await old_message.delete()
+                except discord.NotFound:
+                    pass
+            await self.post_deadline_message(message.channel)
+
+    @commands.command()
+    async def say(self, ctx, *, message):
+        await ctx.send(message)
+        await ctx.message.delete()
 
     @commands.command()
     async def start(self, ctx):
@@ -104,7 +132,7 @@ class Eesa(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member):
         """Gives a specified role to the new member."""
-        role_id = 1002600411099828326 # Replace with the ID of the role you want to give to new members
+        role_id = 1002600411099828326  # Replace with the ID of the role you want to give to new members
         role = member.guild.get_role(role_id)
         if role is None:
             return
@@ -121,6 +149,6 @@ class Eesa(commands.Cog):
             for member in ctx.guild.members:
                 await member.add_roles(role)
             await ctx.send(f"Role {role_name} has been given to everyone.")
-      
+
 async def setup(bot):
     await bot.add_cog(Eesa(bot))
