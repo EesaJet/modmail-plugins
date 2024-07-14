@@ -28,7 +28,7 @@ class Eesa(commands.Cog):
             await message.add_reaction("CANTERBURY:1097286182527828109")
         if "JONATHAN" in message.content.upper():
             await message.add_reaction("JONATHAN:1080274489465651283")
-                if "KAY" in message.content.upper() and not message.author.bot:
+        if "KAY" in message.content.upper() and not message.author.bot:
             await message.add_reaction("🌸")
         if "SUN" in message.content.upper() and not message.author.bot and all(
                 exemption not in message.content.upper() for exemption in exempt_words):
