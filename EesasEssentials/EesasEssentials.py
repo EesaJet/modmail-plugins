@@ -52,7 +52,7 @@ class Essentials(commands.Cog):
     async def post_deadline_message(self, channel):
         self.deadline = self.get_next_monday_midnight()
         unix_timestamp = int(self.deadline.timestamp())
-        message_content = f"## The deadline to submit any activity this week is approximately <t:{unix_timestamp}:R>, on <t:{unix_timestamp}:F>."
+        message_content = f"**The deadline to submit any activity this week is approximately** <t:{unix_timestamp}:R>**, on** <t:{unix_timestamp}:F>"
         message = await channel.send(message_content)
         self.deadline_message_id = message.id
 
