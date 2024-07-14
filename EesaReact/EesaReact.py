@@ -62,6 +62,7 @@ class Eesa(commands.Cog):
                 try:
                     message = await channel.fetch_message(self.deadline_message_id)
                     await message.edit(content="Activity submissions for the week closed.")
+                    await channel.send("https://tenor.com/view/rainbow-border-line-colorful-gif-17203048")
                 except discord.NotFound:
                     pass
             self.deadline_message_id = None  # Reset the message ID
