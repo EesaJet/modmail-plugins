@@ -16,6 +16,9 @@ class Essentials(commands.Cog):
         self.channel_id = 466682606373830657
         self.deadline = self.get_next_monday_midnight()
         self.check_deadline.start()
+        self.role_ids = [1002600411099828326, 455190182623313940] # Replace with your desired role IDs
+        self.shift_notifications_role_id = 1237844151525969930  # Role ID for Shift Notifications
+        self.last_tag_time = datetime.now() - timedelta(minutes=90)  # Initialize last tag time
 
     message_counter = {}
 
@@ -80,6 +83,14 @@ class Essentials(commands.Cog):
                 except discord.NotFound:
                     pass
             await self.post_deadline_message(message.channel)
+
+        if message.channel.id == 550791497880961047 and message.author.id == 1233898948100362321:
+        # Check if it's been more than 2 minutes since last tag
+        if datetime.now() - self.last_tag_time >= timedelta(minutes=90):
+            role = message.guild.get_role(self.shift_notifications_role_id)
+            if role:
+                await message.channel.send(role.mention)
+                self.last_tag_time = datetime.now()
 
     @commands.command()
     async def say(self, ctx, *, message):
@@ -153,6 +164,14 @@ class Essentials(commands.Cog):
             for member in ctx.guild.members:
                 await member.add_roles(role)
             await ctx.send(f"Role {role_name} has been given to everyone.")
+
+    @commands.Cog.listener()
+    async def on_member_join(self, member: discord.Member):
+        guild = member.guild
+        for role_id in self.role_ids:
+            role = guild.get_role(role_id)
+            if role is not None:
+                await member.add_roles(role)
 
 async def setup(bot):
     await bot.add_cog(Essentials(bot))
