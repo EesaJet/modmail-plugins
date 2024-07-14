@@ -86,11 +86,11 @@ class Essentials(commands.Cog):
 
         if message.channel.id == 550791497880961047 and message.author.id == 1233898948100362321:
         # Check if it's been more than 2 minutes since last tag
-        if datetime.now() - self.last_tag_time >= timedelta(minutes=90):
-            role = message.guild.get_role(self.shift_notifications_role_id)
-            if role:
-                await message.channel.send(role.mention)
-                self.last_tag_time = datetime.now()
+            if datetime.now() - self.last_tag_time >= timedelta(minutes=90):
+                role = message.guild.get_role(self.shift_notifications_role_id)
+                if role:
+                    await message.channel.send(role.mention)
+                    self.last_tag_time = datetime.now()
 
     @commands.command()
     async def say(self, ctx, *, message):
