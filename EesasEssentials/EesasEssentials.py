@@ -52,24 +52,25 @@ class Essentials(commands.Cog):
     async def post_deadline_message(self, channel):
         self.deadline = self.get_next_monday_midnight()
         unix_timestamp = int(self.deadline.timestamp())
-        message_content = f"The deadline to submit any activity this week is approximately <t:{unix_timestamp}:R>, on **<t:{unix_timestamp}:F>**"
+        message_content = f"The deadline to submit activity for this week is approximately <t:{unix_timestamp}:R>, on **<t:{unix_timestamp}:F>**"
         message = await channel.send(message_content)
         self.deadline_message_id = message.id
 
 
-    @tasks.loop(minutes=1)
-    async def check_deadline(self):
-        now = datetime.now(pytz.timezone('Europe/London'))
-        if now >= self.deadline:
-            channel = self.bot.get_channel(self.channel_id)
-            if channel and self.deadline_message_id:
-                try:
-                    message = await channel.fetch_message(self.deadline_message_id)
-                    await message.edit(content="Activity submissions for the week closed.")
-                    await channel.send("https://tenor.com/view/rainbow-border-line-colorful-gif-17203048")
-                except discord.NotFound:
-                    pass
-            self.deadline_message_id = None  # Reset the message ID
+@tasks.loop(minutes=1)
+async def check_deadline(self):
+    now = datetime.now(pytz.timezone('Europe/London'))
+    if now >= self.deadline:
+        channel = self.bot.get_channel(self.channel_id)
+        if channel and self.deadline_message_id:
+            try:
+                message = await channel.fetch_message(self.deadline_message_id)
+                await message.delete()
+                await channel.send("Activity submissions for the week closed.")
+                await channel.send("https://tenor.com/view/rainbow-border-line-colorful-gif-17203048")
+            except discord.NotFound:
+                pass
+        self.deadline_message_id = None  # Reset the message ID
 
     @commands.Cog.listener()
     async def on_message(self, message):
