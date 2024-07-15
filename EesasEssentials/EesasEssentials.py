@@ -57,20 +57,20 @@ class Essentials(commands.Cog):
         self.deadline_message_id = message.id
 
 
-@tasks.loop(minutes=1)
-async def check_deadline(self):
-    now = datetime.now(pytz.timezone('Europe/London'))
-    if now >= self.deadline:
-        channel = self.bot.get_channel(self.channel_id)
-        if channel and self.deadline_message_id:
-            try:
-                message = await channel.fetch_message(self.deadline_message_id)
-                await message.delete()
-                await channel.send("Activity submissions for the week closed.")
-                await channel.send("https://tenor.com/view/rainbow-border-line-colorful-gif-17203048")
-            except discord.NotFound:
-                pass
-        self.deadline_message_id = None  # Reset the message ID
+    @tasks.loop(minutes=1)
+    async def check_deadline(self):
+        now = datetime.now(pytz.timezone('Europe/London'))
+        if now >= self.deadline:
+            channel = self.bot.get_channel(self.channel_id)
+            if channel and self.deadline_message_id:
+                try:
+                    message = await channel.fetch_message(self.deadline_message_id)
+                    await message.delete()
+                    await channel.send("Activity submissions for the week closed.")
+                    await channel.send("https://tenor.com/view/rainbow-border-line-colorful-gif-17203048")
+                except discord.NotFound:
+                    pass
+            self.deadline_message_id = None  # Reset the message ID
 
     @commands.Cog.listener()
     async def on_message(self, message):
