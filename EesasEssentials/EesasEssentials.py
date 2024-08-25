@@ -186,7 +186,7 @@ class Essentials(commands.Cog):
                 
                 # Ensure the message author is not a bot
                 if not message.author.bot:
-                    formatted_message = f"`{message.content}`"
+                    formatted_message = f"```{message.content}```"
                     # DM the user, quoting the message content
                     dm_message = (
                         f"The following activity log which you have submitted has been declined:\n"
