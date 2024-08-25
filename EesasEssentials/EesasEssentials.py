@@ -175,5 +175,20 @@ class Essentials(commands.Cog):
             if role is not None:
                 await member.add_roles(role)
 
+    @commands.Cog.listener()
+    async def on_raw_reaction_add(self, payload):
+        # Check if the reaction was added in the activity logs channel
+        if payload.channel_id == 466682606373830657:
+            # Check if the emoji is an "x" and the reactor is either yourself or Kay
+            if str(payload.emoji) == "❌" and payload.user_id in [303491008119832577, 259143946150739969]:
+                channel = self.bot.get_channel(payload.channel_id)
+                message = await channel.fetch_message(payload.message_id)
+                
+                # Ensure the message author is not a bot
+                if not message.author.bot:
+                    # DM the user
+                    dm_message = f"The following activity log which you have submitted has been declined:\n{message.jump_url}"
+                    await message.author.send(dm_message)
+
 async def setup(bot):
     await bot.add_cog(Essentials(bot))
