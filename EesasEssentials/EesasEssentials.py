@@ -191,7 +191,7 @@ class Essentials(commands.Cog):
                     dm_message = (
                         f"The following activity log which you have submitted has been declined:\n"
                         f"{formatted_message}\n"
-                        "Please see <#466682606373830657> for more information and amend your log as required."
+                        "\nPlease see <#466682606373830657> for more information and amend your log as required."
                     )
                     await message.author.send(dm_message)
 
