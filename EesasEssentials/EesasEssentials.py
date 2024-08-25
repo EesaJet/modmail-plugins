@@ -187,7 +187,7 @@ class Essentials(commands.Cog):
                 # Ensure the message author is not a bot
                 if not message.author.bot:
                     # DM the user, quoting the message content
-                    dm_message = (f"The following activity log which you have submitted has been declined:\n`"{message.content}"`\n\nPlease see <#466682606373830657> for more information and amend your log as required.")
+                    dm_message = (f"The following activity log which you have submitted has been declined:\n\`"{message.content}\"`\n\nPlease see <#466682606373830657> for more information and amend your log as required.")
                     await message.author.send(dm_message)
 
 async def setup(bot):
