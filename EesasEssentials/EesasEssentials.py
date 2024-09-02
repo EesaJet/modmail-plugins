@@ -176,52 +176,52 @@ class Essentials(commands.Cog):
                 await member.add_roles(role)
 
     @commands.Cog.listener()
-        async def on_raw_reaction_add(self, payload):
-            # Check if the reaction was added in the activity logs channel
-            if payload.channel_id == 466682606373830657:
-                # Check if the emoji is an "x" and the reactor is either yourself or Kay
-                if str(payload.emoji) == "❌" and payload.user_id in [303491008119832577, 259143946150739969]:
-                    channel = self.bot.get_channel(payload.channel_id)
-                    message = await channel.fetch_message(payload.message_id)
-    
-                    # Ensure the message author is not a bot
-                    if not message.author.bot:
-                        formatted_message = f"```{message.content}```"
-                        # DM the user, quoting the message content
-                        dm_message = (
-                            f"# ❌ Activity log __DECLINED__"
-                            f"\nThe following activity log which you have submitted has been DECLINED:\n{formatted_message}\n"
-                            "\nPlease see <#466682606373830657> for more information and amend your log as required."
-                        )
-                        await message.author.send(dm_message)
-    
-            # Check if the reaction was added in the new channel (455404878202798100)
-            elif payload.channel_id == 455404878202798100:
+    async def on_raw_reaction_add(self, payload):
+        # Check if the reaction was added in the activity logs channel
+        if payload.channel_id == 466682606373830657:
+            # Check if the emoji is an "x" and the reactor is either yourself or Kay
+            if str(payload.emoji) == "❌" and payload.user_id in [303491008119832577, 259143946150739969]:
                 channel = self.bot.get_channel(payload.channel_id)
                 message = await channel.fetch_message(payload.message_id)
-    
-                if str(payload.emoji) == "✅" and payload.user_id in [303491008119832577, 259143946150739969]:
-                    # Ensure the message author is not a bot
-                    if not message.author.bot:
-                        formatted_message = f"```{message.content}```"
-                        # DM the user, quoting the message content
-                        dm_message = (
-                            f"# ✅ Inactivity request APPROVED"
-                            f"\nThe following inactivty request which you have submitted has been APPROVED:\n{formatted_message}\n"
-                            "\nThis will be noted on the staff actiivty tracker and you will be given the LoA role when your inactivity begins. If you need to adjust the dates of your inactivity, please ensure you inform <@303491008119832577> in <#455404878202798100>."
-                        )
-                        await message.author.send(dm_message)
-                elif str(payload.emoji) == "❌" and payload.user_id in [303491008119832577, 259143946150739969]:
-                    # Ensure the message author is not a bot
-                    if not message.author.bot:
-                        formatted_message = f"```{message.content}```"
-                        # DM the user, quoting the message content
-                        dm_message = (
-                            f"# ❌ Inactivity request __DECLINED__"
-                            f"\nThe following inactivty request which you have submitted has been DECLINED:\n{formatted_message}\n"
-                            "\nPlease see <#455404878202798100> for more information and amend your log as required."
-                        )
-                        await message.author.send(dm_message)
+
+                # Ensure the message author is not a bot
+                if not message.author.bot:
+                    formatted_message = f"```{message.content}```"
+                    # DM the user, quoting the message content
+                    dm_message = (
+                        f"# ❌ Activity log __DECLINED__"
+                        f"\nThe following activity log which you have submitted has been DECLINED:\n{formatted_message}\n"
+                        "\nPlease see <#466682606373830657> for more information and amend your log as required."
+                    )
+                    await message.author.send(dm_message)
+
+        # Check if the reaction was added in the new channel (455404878202798100)
+        elif payload.channel_id == 455404878202798100:
+            channel = self.bot.get_channel(payload.channel_id)
+            message = await channel.fetch_message(payload.message_id)
+
+            if str(payload.emoji) == "✅" and payload.user_id in [303491008119832577, 259143946150739969]:
+                # Ensure the message author is not a bot
+                if not message.author.bot:
+                    formatted_message = f"```{message.content}```"
+                    # DM the user, quoting the message content
+                    dm_message = (
+                        f"# ✅ Inactivity request APPROVED"
+                        f"\nThe following inactivty request which you have submitted has been APPROVED:\n{formatted_message}\n"
+                        "\nThis will be noted on the staff actiivty tracker and you will be given the LoA role when your inactivity begins. If you need to adjust the dates of your inactivity, please ensure you inform <@303491008119832577> in <#455404878202798100>."
+                    )
+                    await message.author.send(dm_message)
+            elif str(payload.emoji) == "❌" and payload.user_id in [303491008119832577, 259143946150739969]:
+                # Ensure the message author is not a bot
+                if not message.author.bot:
+                    formatted_message = f"```{message.content}```"
+                    # DM the user, quoting the message content
+                    dm_message = (
+                        f"# ❌ Inactivity request __DECLINED__"
+                        f"\nThe following inactivty request which you have submitted has been DECLINED:\n{formatted_message}\n"
+                        "\nPlease see <#455404878202798100> for more information and amend your log as required."
+                    )
+                    await message.author.send(dm_message)
 
 async def setup(bot):
     await bot.add_cog(Essentials(bot))
