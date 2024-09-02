@@ -208,7 +208,7 @@ class Essentials(commands.Cog):
                     dm_message = (
                         f"# ✅ Inactivity request APPROVED"
                         f"\nThe following inactivty request which you have submitted has been APPROVED:\n{formatted_message}\n"
-                        "\nThis will be noted on the staff actiivty tracker and you will be given the LoA role when your inactivity begins. If you need to adjust the dates of your inactivity, please ensure you inform <@303491008119832577> in <#455404878202798100>."
+                        "\nThis will be noted on the staff activity tracker and you will be given the LoA role when your inactivity begins.\nIf you need to adjust the dates of your inactivity, please ensure you inform <@303491008119832577> in <#455404878202798100>."
                     )
                     await message.author.send(dm_message)
             elif str(payload.emoji) == "❌" and payload.user_id in [303491008119832577, 259143946150739969]:
