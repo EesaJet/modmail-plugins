@@ -538,14 +538,29 @@ class ModerationLogging:
             if attachments:
                 embed.add_field(name="Attachments", value="\n".join(attachments), inline=False)
             
-            if message.embeds:
-                for original_embed in message.embeds:
-                    repost_embed = discord.Embed.from_dict(original_embed.to_dict())
-                    repost_embed.title = "Reposted Deleted Embed"
-                    repost_embed.color = discord.Color.orange()
+            if channel.id == 455207881747464192:
+                if message.embeds:
+                    for original_embed in message.embeds:
+                        repost_embed = discord.Embed.from_dict(original_embed.to_dict())
+                        repost_embed.title = "Reposted Deleted Embed"
+                        repost_embed.color = discord.Color.orange()
+                        webhook = await self._get_or_create_webhook(channel)
+                        if webhook:
+                            await webhook.send(embed=repost_embed, username=message.author.display_name, avatar_url=message.author.display_avatar.url)
+                else:
+                    repost_embed = discord.Embed(
+                        title="Reposted Deleted Message",
+                        description=content or "No content available",
+                        color=discord.Color.orange(),
+                        timestamp=discord.utils.utcnow()
+                    )
+                    repost_embed.set_author(name=message.author.display_name, icon_url=message.author.display_avatar.url)
+                    if attachments:
+                        repost_embed.add_field(name="Attachments", value="\n".join(attachments), inline=False)
                     webhook = await self._get_or_create_webhook(channel)
                     if webhook:
                         await webhook.send(embed=repost_embed, username=message.author.display_name, avatar_url=message.author.display_avatar.url)
+                return  # Prevent duplicate logging for this specific channel
         else:
             content = None
             footer_text = f"Message ID: {payload.message_id}\nChannel ID: {payload.channel_id}"
