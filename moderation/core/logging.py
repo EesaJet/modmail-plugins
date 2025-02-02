@@ -515,9 +515,6 @@ class ModerationLogging:
         ignored_channel_ids = [937999681915604992]  # Adjusted to not ignore 455207881747464192
         message = payload.cached_message
         
-        if message and message.author.bot and message.channel.id not in ignored_channel_ids:
-            return
-    
         action = "message deleted"
         embed = discord.Embed(
             color=action_colors.get(action, action_colors["normal"]),
@@ -552,16 +549,19 @@ class ModerationLogging:
             embed.set_footer(text=footer_text)
         
         if channel.id == 455207881747464192:  # Check if the deleted message is from the specified channel
-            repost_embed = discord.Embed(
-                title="Reposted Deleted Message",
-                description=content or "No content available",
-                color=discord.Color.orange(),
-                timestamp=discord.utils.utcnow()
-            )
-            repost_embed.set_author(name=message.author.display_name, icon_url=message.author.display_avatar.url)
-            if attachments:
-                repost_embed.add_field(name="Attachments", value="\n".join(attachments), inline=False)
-            await channel.send(embed=repost_embed)
+            webhook = await self._get_or_create_webhook(channel)
+            if webhook:
+                repost_embed = discord.Embed(
+                    title="Reposted Deleted Message",
+                    description=content or "No content available",
+                    color=discord.Color.orange(),
+                    timestamp=discord.utils.utcnow()
+                )
+                if message:
+                    repost_embed.set_author(name=message.author.display_name, icon_url=message.author.display_avatar.url)
+                if attachments:
+                    repost_embed.add_field(name="Attachments", value="\n".join(attachments), inline=False)
+                await webhook.send(embed=repost_embed, username=message.author.display_name if message else "Unknown", avatar_url=message.author.display_avatar.url if message else None)
     
         await self.send_log(
             guild,
