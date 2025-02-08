@@ -514,7 +514,11 @@ class ModerationLogging:
     
         ignored_channel_ids = [937999681915604992]  # Adjusted to not ignore 455207881747464192
         message = payload.cached_message
-        
+    
+        # Ignore deleted messages from bots in all channels except 455207881747464192
+        if message and message.author.bot and channel.id != 455207881747464192:
+            return
+    
         action = "message deleted"
         embed = discord.Embed(
             color=action_colors.get(action, action_colors["normal"]),
