@@ -86,20 +86,25 @@ class Essentials(commands.Cog):
                     pass
             await self.post_deadline_message(message.channel)
 
-        # Group shout ping starts here
+        # Group shout ping + "Shift Cornwall" watcher
         if message.channel.id == 550791497880961047 and message.author.id == 1233898948100362321:
-        # Check if it's been more than 2 minutes since last tag
+            # 1) role ping every 90m
             if datetime.now() - self.last_tag_time >= timedelta(minutes=90):
                 role = message.guild.get_role(self.shift_notifications_role_id)
                 if role:
                     await message.channel.send(role.mention)
                     self.last_tag_time = datetime.now()
 
-            # — 2) new: scan embed for "Shift" + "Cornwall" —
+            # 2) scan embed for "Shift" + "Cornwall"
             for embed in message.embeds:
                 desc = (embed.description or "").lower()
                 if "shift" in desc and "cornwall" in desc:
+                    # grab the embed-author name (fallback to bot/user if missing)
+                    author_name = embed.author.name if embed.author and embed.author.name else "Unknown"
+
+                    # send your link + embed-author
                     await message.channel.send(
+                        f"📢 **Shift on Cornwall** announced by **{author_name}**!\n"
                         "https://www.roblox.com/games/4986113387/UPDATE-The-West-Cornwall-Project"
                     )
                     break
