@@ -86,36 +86,46 @@ class Essentials(commands.Cog):
                     pass
             await self.post_deadline_message(message.channel)
 
-        # Group shout ping + "Shift Cornwall" watcher
+        # Group shout ping + multi-location “Shift” watcher
         if message.channel.id == 550791497880961047 and message.author.id == 1233898948100362321:
-            # 1) role ping every 90m
-            if datetime.now() - self.last_tag_time >= timedelta(minutes=90):
-                role = message.guild.get_role(self.shift_notifications_role_id)
-                if role:
-                    await message.channel.send(role.mention)
-                    self.last_tag_time = datetime.now()
-
-            # 2) scan embed for “Shift”+“Cornwall”
+            # scan each embed
             for embed in message.embeds:
                 desc = embed.description or ""
-                lowered = desc.lower()
-                if "shift" in lowered and "cornwall" in lowered:
-                    # pull and clean each line
-                    lines = desc.splitlines()
-                    filtered_lines = [
-                        line for line in lines
-                        if not line.strip().lower().startswith(("group:", "channel:"))
-                    ]
-                    filtered_desc = "\n".join(filtered_lines).strip()
+                lower = desc.lower()
 
-                    author_name = embed.author.name if embed.author and embed.author.name else "Unknown"
+                # we only care about embeds that mention “shift”
+                if "shift" not in lower:
+                    continue
 
-                    await message.channel.send(
-                        f"📢 **Shift on Cornwall** announced by **{author_name}**\n\n"
-                        f"{filtered_desc}\n\n"
-                        "https://www.roblox.com/games/4986113387/UPDATE-The-West-Cornwall-Project"
-                    )
-                    break
+                # map of location keywords → (display name, game link)
+                location_map = {
+                    "cornwall":    ("Cornwall",    "https://www.roblox.com/games/4986113387/UPDATE-The-West-Cornwall-Project"),
+                    "palm beach":  ("Palm Beach Resort & Spa",  "https://www.roblox.com/games/14918591976/Palm-Beach-Resort-Spa"),
+                    "northpark":   ("Northpark C Line",   "https://www.roblox.com/games/2337773502/Northpark-C-Line"),
+                }
+
+                # find which location (if any) is in the text
+                for key, (pretty_name, game_link) in location_map.items():
+                    if key in lower:
+                        # clean out the Group:/Channel: lines
+                        lines = desc.splitlines()
+                        filtered = [
+                            l for l in lines
+                            if not l.strip().lower().startswith(("group:", "channel:"))
+                        ]
+                        filtered_desc = "\n".join(filtered).strip()
+
+                        author_name = embed.author.name if embed.author and embed.author.name else "Unknown"
+
+                        # build & send your announcement
+                        await message.channel.send(
+                            f"📢 **Shift on {pretty_name}** announced by **{author_name}**\n\n"
+                            f"{filtered_desc}\n\n"
+                            f"**Game Link: 🔗** {game_link}\n"
+                            "<@&711602178602696705>"
+                        )
+                        return   # done, don’t re-process this message
+            # end for embed
 
     @commands.command()
     async def say(self, ctx, *, message):
