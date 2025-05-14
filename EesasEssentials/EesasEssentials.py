@@ -86,6 +86,7 @@ class Essentials(commands.Cog):
                     pass
             await self.post_deadline_message(message.channel)
 
+        # Group shout ping starts here
         if message.channel.id == 550791497880961047 and message.author.id == 1233898948100362321:
         # Check if it's been more than 2 minutes since last tag
             if datetime.now() - self.last_tag_time >= timedelta(minutes=90):
@@ -93,6 +94,15 @@ class Essentials(commands.Cog):
                 if role:
                     await message.channel.send(role.mention)
                     self.last_tag_time = datetime.now()
+
+            # — 2) new: scan embed for "Shift" + "Cornwall" —
+            for embed in message.embeds:
+                desc = (embed.description or "").lower()
+                if "shift" in desc and "cornwall" in desc:
+                    await message.channel.send(
+                        "https://www.roblox.com/games/4986113387/UPDATE-The-West-Cornwall-Project"
+                    )
+                    break
 
     @commands.command()
     async def say(self, ctx, *, message):
