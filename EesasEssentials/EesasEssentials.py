@@ -86,33 +86,33 @@ class Essentials(commands.Cog):
                     pass
             await self.post_deadline_message(message.channel)
 
-        # ——— “Shift Cornwall” watcher ———
+        # Group shout ping + "Shift Cornwall" watcher
         if message.channel.id == 550791497880961047 and message.author.id == 1233898948100362321:
-            # 1) every 90m role ping
+            # 1) role ping every 90m
             if datetime.now() - self.last_tag_time >= timedelta(minutes=90):
                 role = message.guild.get_role(self.shift_notifications_role_id)
                 if role:
                     await message.channel.send(role.mention)
                     self.last_tag_time = datetime.now()
 
-            # 2) look for “Shift”+“Cornwall” in the embed’s title
+            # 2) scan embed for “Shift”+“Cornwall”
             for embed in message.embeds:
-                title = embed.title or ""
-                lower = title.lower()
-                if lower.startswith("new announcement:") and "shift" in lower and "cornwall" in lower:
-                    # strip off the “New Announcement:” prefix…
-                    announcement = title.split(":", 1)[1].strip()
+                desc = embed.description or ""
+                lowered = desc.lower()
+                if "shift" in lowered and "cornwall" in lowered:
+                    # pull and clean each line
+                    lines = desc.splitlines()
+                    filtered_lines = [
+                        line for line in lines
+                        if not line.strip().lower().startswith(("group:", "channel:"))
+                    ]
+                    filtered_desc = "\n".join(filtered_lines).strip()
 
-                    # grab author name
-                    author_name = (
-                        embed.author.name
-                        if embed.author and embed.author.name
-                        else "Unknown"
-                    )
+                    author_name = embed.author.name if embed.author and embed.author.name else "Unknown"
 
-                    # send just the cleaned-up announce text + link
                     await message.channel.send(
-                        f"📢 **{announcement}** announced by **{author_name}**\n"
+                        f"📢 **Shift on Cornwall** announced by **{author_name}**\n\n"
+                        f"{filtered_desc}\n\n"
                         "https://www.roblox.com/games/4986113387/UPDATE-The-West-Cornwall-Project"
                     )
                     break
