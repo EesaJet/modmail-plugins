@@ -17,7 +17,7 @@ class Essentials(commands.Cog):
         self.deadline = self.get_next_monday_midnight()
         self.check_deadline.start()
         self.role_ids = [1002600411099828326, 455190182623313940] # Replace with your desired role IDs
-        self.shift_notifications_role_id = 1237844151525969930  # Role ID for Shift Notifications
+        self.shift_notifications_role_id = 711602178602696705  # Role ID for Shift Notifications
         self.last_tag_time = datetime.now() - timedelta(minutes=90)  # Initialize last tag time
 
     message_counter = {}
