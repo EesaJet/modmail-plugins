@@ -168,6 +168,8 @@ class Essentials(commands.Cog):
                             if embed.author and embed.author.name
                             else "Unknown"
                         )
+
+                        embed_title = embed.title
     
                         await message.channel.send(
                             f"📢 **{embed_title}** posted by **{author_name}**\n\n"
