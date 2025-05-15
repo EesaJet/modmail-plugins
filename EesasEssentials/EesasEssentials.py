@@ -94,25 +94,25 @@ class Essentials(commands.Cog):
                 "palm beach":  ("Palm Beach Resort & Spa", "https://www.roblox.com/games/14918591976/Palm-Beach-Resort-Spa"),
                 "northpark":   ("Northpark C Line",        "https://www.roblox.com/games/2337773502/Northpark-C-Line"),
             }
-            # strip out Group:/Channel: lines
-            filtered_lines = [
-                line for line in desc.splitlines()
-                if not line.strip().lower().startswith(("group:", "channel:"))
-            ]
-            filtered_desc = "\n".join(filtered_lines).strip()
-
-            author_name = (
-                embed.author.name
-                if embed.author and embed.author.name
-                else "Unknown"
-            )
-
-            embed_title = embed.title
             
             for embed in message.embeds:
                 title = embed.title or ""
                 desc  = embed.description or ""
                 combined = f"{title}\n{desc}".lower()
+                author_name = (
+                    embed.author.name
+                    if embed.author and embed.author.name
+                    else "Unknown"
+                )
+    
+                embed_title = embed.title
+                
+                # strip out Group:/Channel: lines
+                filtered_lines = [
+                    line for line in desc.splitlines()
+                    if not line.strip().lower().startswith(("group:", "channel:"))
+                ]
+                filtered_desc = "\n".join(filtered_lines).strip()
 
                 # 1) “Shift ended” notifier
                 if "shift" in combined and "ended" in combined:
