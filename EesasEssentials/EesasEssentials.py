@@ -145,9 +145,11 @@ class Essentials(commands.Cog):
                             if embed.author and embed.author.name
                             else "Unknown"
                         )
+
+                        embed_title = embed.title
     
                         await message.channel.send(
-                            f"📢 **Announcement posted by {author_name}**\n\n"
+                            f"📢 **{embed_title}** posted by **{author_name}**\n\n"
                             f"{filtered_desc}\n\n"
                             f"**Game Link: 🔗** {game_link}\n"
                             "<@&711602178602696705>"
@@ -168,7 +170,7 @@ class Essentials(commands.Cog):
                         )
     
                         await message.channel.send(
-                            f"📢 **Announcement posted by {author_name}**\n\n"
+                            f"📢 **{embed_title}** posted by **{author_name}**\n\n"
                             f"{filtered_desc}\n\n"
                             "<@&711602178602696705>"
                         )
