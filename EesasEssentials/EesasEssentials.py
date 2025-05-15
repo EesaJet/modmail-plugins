@@ -94,7 +94,21 @@ class Essentials(commands.Cog):
                 "palm beach":  ("Palm Beach Resort & Spa", "https://www.roblox.com/games/14918591976/Palm-Beach-Resort-Spa"),
                 "northpark":   ("Northpark C Line",        "https://www.roblox.com/games/2337773502/Northpark-C-Line"),
             }
+            # strip out Group:/Channel: lines
+            filtered_lines = [
+                line for line in desc.splitlines()
+                if not line.strip().lower().startswith(("group:", "channel:"))
+            ]
+            filtered_desc = "\n".join(filtered_lines).strip()
 
+            author_name = (
+                embed.author.name
+                if embed.author and embed.author.name
+                else "Unknown"
+            )
+
+            embed_title = embed.title
+            
             for embed in message.embeds:
                 title = embed.title or ""
                 desc  = embed.description or ""
@@ -109,19 +123,6 @@ class Essentials(commands.Cog):
                 if "shift" in combined:
                     for key, (place_name, game_link) in location_map.items():
                         if key in combined:
-                            # strip out Group:/Channel: lines
-                            filtered_lines = [
-                                line for line in desc.splitlines()
-                                if not line.strip().lower().startswith(("group:", "channel:"))
-                            ]
-                            filtered_desc = "\n".join(filtered_lines).strip()
-
-                            author_name = (
-                                embed.author.name
-                                if embed.author and embed.author.name
-                                else "Unknown"
-                            )
-
                             await message.channel.send(
                                 f"📢 **Shift on {place_name}** announced by **{author_name}**\n\n"
                                 f"{filtered_desc}\n\n"
@@ -133,21 +134,6 @@ class Essentials(commands.Cog):
                 # 3) fallback for any other embed
                 for key, (_, game_link) in location_map.items():
                     if key in combined:
-                        # strip out Group:/Channel: lines
-                        filtered_lines = [
-                            line for line in desc.splitlines()
-                            if not line.strip().lower().startswith(("group:", "channel:"))
-                        ]
-                        filtered_desc = "\n".join(filtered_lines).strip()
-    
-                        author_name = (
-                            embed.author.name
-                            if embed.author and embed.author.name
-                            else "Unknown"
-                        )
-
-                        embed_title = embed.title
-    
                         await message.channel.send(
                             f"📢 **{embed_title}** posted by **{author_name}**\n\n"
                             f"{filtered_desc}\n\n"
@@ -156,26 +142,11 @@ class Essentials(commands.Cog):
                         )
                         return
                         
-                    else:
-                        filtered_lines = [
-                            line for line in desc.splitlines()
-                            if not line.strip().lower().startswith(("group:", "channel:"))
-                        ]
-                        filtered_desc = "\n".join(filtered_lines).strip()
-    
-                        author_name = (
-                            embed.author.name
-                            if embed.author and embed.author.name
-                            else "Unknown"
-                        )
-
-                        embed_title = embed.title
-    
-                        await message.channel.send(
-                            f"📢 **{embed_title}** posted by **{author_name}**\n\n"
-                            f"{filtered_desc}\n\n"
-                            "<@&711602178602696705>"
-                        )
+                await message.channel.send(
+                    f"📢 **{embed_title}** posted by **{author_name}**\n\n"
+                    f"{filtered_desc}\n\n"
+                    "<@&711602178602696705>"
+                )
 
     @commands.command()
     async def say(self, ctx, *, message):
