@@ -117,6 +117,7 @@ class Essentials(commands.Cog):
                 # 1) “Shift ended” notifier
                 if "shift" in combined and "ended" in combined:
                     await message.channel.send("🔔 The shift has ended, thanks for joining!")
+                    await message.delete()        # ← delete the original embed message
                     return
 
                 # 2) “Shift on <location>” announcer
@@ -129,6 +130,7 @@ class Essentials(commands.Cog):
                                 f"**Game Link: 🔗** {game_link}\n"
                                 "<@&711602178602696705>"
                             )
+                            await message.delete()        # ← delete the original embed message
                             return
 
                 # 3) fallback for any other embed
@@ -140,6 +142,7 @@ class Essentials(commands.Cog):
                             f"**Game Link: 🔗** {game_link}\n"
                             "<@&711602178602696705>"
                         )
+                        await message.delete()        # ← delete the original embed message
                         return
                         
                 await message.channel.send(
@@ -147,6 +150,8 @@ class Essentials(commands.Cog):
                     f"{filtered_desc}\n\n"
                     "<@&711602178602696705>"
                 )
+                await message.delete()        # ← delete the original embed message
+                return
 
     @commands.command()
     async def say(self, ctx, *, message):
