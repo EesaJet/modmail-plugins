@@ -86,46 +86,92 @@ class Essentials(commands.Cog):
                     pass
             await self.post_deadline_message(message.channel)
 
-        # Group shout ping + multi-location “Shift” watcher
+    # Group shout + Shift-watcher
         if message.channel.id == 550791497880961047 and message.author.id == 1233898948100362321:
-            # scan each embed
+            # map of location keywords → (display name, game link)
+            location_map = {
+                "cornwall":    ("Cornwall",                "https://www.roblox.com/games/4986113387/UPDATE-The-West-Cornwall-Project"),
+                "palm beach":  ("Palm Beach Resort & Spa", "https://www.roblox.com/games/14918591976/Palm-Beach-Resort-Spa"),
+                "northpark":   ("Northpark C Line",        "https://www.roblox.com/games/2337773502/Northpark-C-Line"),
+            }
+
             for embed in message.embeds:
-                desc = embed.description or ""
-                lower = desc.lower()
+                title = embed.title or ""
+                desc  = embed.description or ""
+                combined = f"{title}\n{desc}".lower()
 
-                # we only care about embeds that mention “shift”
-                if "shift" not in lower:
-                    continue
+                # 1) “Shift ended” notifier
+                if "shift" in combined and "ended" in combined:
+                    await message.channel.send("🔔 The shift has ended, thanks for joining!")
+                    return
 
-                # map of location keywords → (display name, game link)
-                location_map = {
-                    "cornwall":    ("Cornwall",    "https://www.roblox.com/games/4986113387/UPDATE-The-West-Cornwall-Project"),
-                    "palm beach":  ("Palm Beach Resort & Spa",  "https://www.roblox.com/games/14918591976/Palm-Beach-Resort-Spa"),
-                    "northpark":   ("Northpark C Line",   "https://www.roblox.com/games/2337773502/Northpark-C-Line"),
-                }
+                # 2) “Shift on <location>” announcer
+                if "shift" in combined:
+                    for key, (place_name, game_link) in location_map.items():
+                        if key in combined:
+                            # strip out Group:/Channel: lines
+                            filtered_lines = [
+                                line for line in desc.splitlines()
+                                if not line.strip().lower().startswith(("group:", "channel:"))
+                            ]
+                            filtered_desc = "\n".join(filtered_lines).strip()
 
-                # find which location (if any) is in the text
-                for key, (pretty_name, game_link) in location_map.items():
-                    if key in lower:
-                        # clean out the Group:/Channel: lines
-                        lines = desc.splitlines()
-                        filtered = [
-                            l for l in lines
-                            if not l.strip().lower().startswith(("group:", "channel:"))
+                            author_name = (
+                                embed.author.name
+                                if embed.author and embed.author.name
+                                else "Unknown"
+                            )
+
+                            await message.channel.send(
+                                f"📢 **Shift on {place_name}** announced by **{author_name}**\n\n"
+                                f"{filtered_desc}\n\n"
+                                f"**Game Link: 🔗** {game_link}\n"
+                                "<@&711602178602696705>"
+                            )
+                            return
+
+                # 3) fallback for any other embed
+                for key, (_, game_link) in location_map.items():
+                    if key in combined:
+                        # strip out Group:/Channel: lines
+                        filtered_lines = [
+                            line for line in desc.splitlines()
+                            if not line.strip().lower().startswith(("group:", "channel:"))
                         ]
-                        filtered_desc = "\n".join(filtered).strip()
-
-                        author_name = embed.author.name if embed.author and embed.author.name else "Unknown"
-
-                        # build & send your announcement
+                        filtered_desc = "\n".join(filtered_lines).strip()
+    
+                        author_name = (
+                            embed.author.name
+                            if embed.author and embed.author.name
+                            else "Unknown"
+                        )
+    
                         await message.channel.send(
-                            f"📢 **Shift on {pretty_name}** announced by **{author_name}**\n\n"
+                            f"📢 **Announcement posted by {author_name}**\n\n"
                             f"{filtered_desc}\n\n"
                             f"**Game Link: 🔗** {game_link}\n"
                             "<@&711602178602696705>"
                         )
-                        return   # done, don’t re-process this message
-            # end for embed
+                        return
+                        
+                    else:
+                        filtered_lines = [
+                            line for line in desc.splitlines()
+                            if not line.strip().lower().startswith(("group:", "channel:"))
+                        ]
+                        filtered_desc = "\n".join(filtered_lines).strip()
+    
+                        author_name = (
+                            embed.author.name
+                            if embed.author and embed.author.name
+                            else "Unknown"
+                        )
+    
+                        await message.channel.send(
+                            f"📢 **Announcement posted by {author_name}**\n\n"
+                            f"{filtered_desc}\n\n"
+                            "<@&711602178602696705>"
+                        )
 
     @commands.command()
     async def say(self, ctx, *, message):
