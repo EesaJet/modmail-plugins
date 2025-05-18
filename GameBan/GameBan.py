@@ -114,6 +114,12 @@ class RobloxUserRestriction(commands.Cog):
     
                 data = await list_res.json()
                 print(data)  # parsed JSON
+
+            reason_text  = details.get("displayReason") \
+               or details.get("privateReason") \
+               or details.get("reason")         \
+               or "No reason provided"
+            duration_raw = details.get("duration") or details.get("expiresAt")
     
             # 2) normalize into a Python list
             if isinstance(data, dict) and "data" in data:
@@ -155,8 +161,7 @@ class RobloxUserRestriction(commands.Cog):
                         color=discord.Color.from_rgb(252, 202, 98)
                     )
                     ban_embed.description = (
-                        f"**Banned for:** {reason}\n"
-                        f"**Original Duration:** {'Permanent' if permanent else duration}\n"
+                        f"**Banned for:** {reason_text}\n"
                         f"**Restriction ID**: {rid}"
                     )
                     ban_embed.set_footer(
