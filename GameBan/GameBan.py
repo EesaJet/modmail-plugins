@@ -115,11 +115,11 @@ class RobloxUserRestriction(commands.Cog):
                 data = await list_res.json()
                 print(data)  # parsed JSON
 
-            reason_text  = details.get("displayReason") \
-               or details.get("privateReason") \
-               or details.get("reason")         \
+            reason_text  = data.get("displayReason") \
+               or data.get("privateReason") \
+               or data.get("reason")         \
                or "No reason provided"
-            duration_raw = details.get("duration") or details.get("expiresAt")
+            duration_raw = data.get("duration") or data.get("expiresAt")
     
             # 2) normalize into a Python list
             if isinstance(data, dict) and "data" in data:
