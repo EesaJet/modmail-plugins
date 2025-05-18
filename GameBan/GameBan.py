@@ -1,5 +1,7 @@
+import os, logging
+from dotenv import load_dotenv
+load_dotenv()      # ← here
 import pytz
-import os
 import discord
 import aiohttp
 from datetime import timedelta
