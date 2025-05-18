@@ -89,7 +89,7 @@ class RobloxUserRestriction(commands.Cog):
                     await ctx.send(embed=ban_embed)
                 else:
                     ban_embed = discord.Embed(
-                        title="❌ Ban failed"
+                        title="❌ Ban failed",
                         color=discord.Color.red()
                     )
                     ban_embed.description = (f"({res.status}): {text}")
@@ -166,7 +166,7 @@ class RobloxUserRestriction(commands.Cog):
                     await ctx.send(embed=ban_embed)
                 else:
                     ban_embed = discord.Embed(
-                        title="❌ Unban failed"
+                        title="❌ Unban failed",
                         color=discord.Color.red()
                     )
                     ban_embed.description = (f"({res.status}): {text}")
