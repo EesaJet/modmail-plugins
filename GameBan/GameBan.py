@@ -14,6 +14,7 @@ class RobloxUserRestriction(commands.Cog):
         
         logging.info(f"🔑 ROBLOX_API_KEY = {self.api_key!r}")
         logging.info(f"🌐 ROBLOX_UNIVERSE_ID = {self.universe_id!r}")
+        print(os.getenv("ROBLOX_API_KEY"))
 
         if not self.api_key or not self.universe_id:
             raise RuntimeError("Missing ROBLOX_API_KEY or ROBLOX_UNIVERSE_ID!")
