@@ -115,10 +115,7 @@ class RobloxUserRestriction(commands.Cog):
                 data = await list_res.json()
                 print(data)  # parsed JSON
 
-            reason_text  = data.get("displayReason") \
-               or data.get("privateReason") \
-               or data.get("reason")         \
-               or "No reason provided"
+            reason_text  = data.get("displayReason")
             duration_raw = data.get("duration") or data.get("expiresAt")
     
             # 2) normalize into a Python list
