@@ -34,6 +34,14 @@ class RobloxUserRestriction(commands.Cog):
         """
         # parse duration
         permanent = duration.lower() == "perm"
+
+        restriction = {
+                "active":            True,
+                "privateReason":     reason,
+                "displayReason":     reason,
+                "excludeAltAccounts": True
+            }
+        
         if not permanent:
             unit   = duration[-1].lower()
             amount = int(duration[:-1])
@@ -43,13 +51,6 @@ class RobloxUserRestriction(commands.Cog):
                 duration_seconds = amount * 3600
             else:
                 return await ctx.send("❌ Invalid duration. Use Nd, Nh, or perm.")
-
-            restriction = {
-                "active":            True,
-                "privateReason":     reason,
-                "displayReason":     reason,
-                "excludeAltAccounts": True
-            }
 
         if not permanent:
             restriction["duration"] = f"{duration_seconds}s"
