@@ -78,8 +78,6 @@ class RobloxUserRestriction(commands.Cog):
 
     @commands.command(name="runban")
     @commands.has_permissions(kick_members=True)
-    @commands.command(name="runban")
-    @commands.has_permissions(kick_members=True)
     async def roblox_unban(self, ctx, user_id: int):
         """
         Lift any active ban on this user.
