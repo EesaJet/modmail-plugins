@@ -95,21 +95,26 @@ class RobloxUserRestriction(commands.Cog):
                 data = await list_res.json()
                 print(data)
 
-        # after you've done: data = await list_res.json()
-    
-        entries = data.get("data", [])
-        # pull out all the active restrictions
-        active_restrictions = [
-            r for r in entries
-            if r.get("gameJoinRestriction", {}).get("active", False)
-        ]
-    
-        if not active_restrictions:
+        async with session.get(list_url, headers=self.headers) as resp:
+            js = await resp.json()
+        
+        # 2) normalize to a Python list
+        if "data" in js:
+            entries = js["data"]
+        elif "gameJoinRestriction" in js:
+            entries = [js]
+        else:
+            entries = []
+        
+        # 3) find active
+        active = [r for r in entries
+                  if r["gameJoinRestriction"].get("active")]
+        if not active:
             return await ctx.send("ℹ️ No active ban found for that user.")
-    
-        # take the first one
-        restriction = active_restrictions[0]
-        rid = restriction["path"].rsplit("/", 1)[-1]
+        
+        restriction = active[0]
+        rid = restriction["path"].rsplit("/",1)[-1]
+        # … patch it …
     
         # … now build your patch URL and payload as before …
         rid = restriction["path"].rsplit("/", 1)[-1]
