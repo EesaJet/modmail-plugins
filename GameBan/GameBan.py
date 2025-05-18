@@ -95,15 +95,13 @@ class RobloxUserRestriction(commands.Cog):
                 data = await list_res.json()
                 print(data)
 
-        # 2) find the first active restriction
-        restriction = next(
-            (r for r in data.get("data", []) if r["gameJoinRestriction"]["active"]),
-            None
-        )
-        if not restriction:
+        entries = data.get("data", [])
+        if not entries or not entries[0]["gameJoinRestriction"]["active"]:
             return await ctx.send("ℹ️ No active ban found for that user.")
-
-        # extract the restriction ID
+        
+        restriction = entries[0]
+        # … now use restriction["path"] …
+        
         rid = restriction["path"].rsplit("/", 1)[-1]
         patchurl = f"{self.base_url}/{rid}?updateMask=gameJoinRestriction"
 
