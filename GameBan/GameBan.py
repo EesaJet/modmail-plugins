@@ -84,7 +84,7 @@ class RobloxUserRestriction(commands.Cog):
                     )
                     ban_embed.set_footer(
                         text=f"Banned by {ctx.author}",
-                        icon_url=ctx.author.avatar_url  # or .avatar_url if on older discord.py
+                        icon_url=ctx.author.avatar.url  # or .avatar_url if on older discord.py
                     )                   
                     await ctx.send(embed=ban_embed)
                 else:
