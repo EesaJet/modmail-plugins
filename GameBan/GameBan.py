@@ -45,10 +45,13 @@ class RobloxUserRestriction(commands.Cog):
             else:
                 return await ctx.send("❌ Invalid duration. Use Nd, Nh, or perm.")
 
+        if duration_seconds ~= None
+            duration = f"{duration_seconds}s"
+
         payload = {
             "gameJoinRestriction": {
                 "active":            True,
-                "duration":          f"{duration_seconds}s",
+                "duration":          {duration},
                 "privateReason":     reason,
                 "displayReason":     reason,
                 "excludeAltAccounts": True
