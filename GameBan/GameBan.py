@@ -1,9 +1,8 @@
-import os, logging
+import os
 from dotenv import load_dotenv
 load_dotenv()      # ← here
-import pytz
-import discord
-import aiohttp
+
+import logging, pytz, discord, aiohttp
 from datetime import timedelta
 from discord.ext import commands
 
