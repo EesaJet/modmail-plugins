@@ -74,13 +74,13 @@ class RobloxUserRestriction(commands.Cog):
                     rid = data["path"].rsplit("/", 1)[-1]
                     
                     ban_embed = discord.Embed(
-                        title=f"⚠️ User Banned — ID: {user_id}",
+                        title=f"<:ban_hammer:918264271090106379> User Game Banned — ID: {user_id}",
                         color=discord.Color.red()
                     )
                     ban_embed.description = (
                         f"**Reason:** {reason}\n"
                         f"**Duration:** {'Permanent' if permanent else duration}\n"
-                        f"Restriction ID: {rid}"
+                        f"**Restriction ID**: {rid}"
                     )
                     ban_embed.set_footer(
                         text=f"Banned by {ctx.author}",
@@ -88,7 +88,12 @@ class RobloxUserRestriction(commands.Cog):
                     )                   
                     await ctx.send(embed=ban_embed)
                 else:
-                    await ctx.send(f"❌ Ban failed ({res.status}): {text}")
+                    ban_embed = discord.Embed(
+                        title="❌ Ban failed"
+                        color=discord.Color.red()
+                    )
+                    ban_embed.description = (f"({res.status}): {text}")
+                    await ctx.send(embed=ban_embed)
 
     @commands.command(name="runban")
     @commands.has_permissions(kick_members=True)
@@ -124,8 +129,11 @@ class RobloxUserRestriction(commands.Cog):
                 if r.get("gameJoinRestriction", {}).get("active", False)
             ]
             if not active:
-                return await ctx.send("ℹ️ No active ban found for that user.")
-    
+                    ban_embed = discord.Embed(
+                        color=discord.Color.blue()
+                    )
+                    ban_embed.description = ("ℹ️ No active ban found for that user.")
+            
             # 4) take the first active restriction and patch it inactive
             restriction = active[0]
             rid = restriction["path"].rsplit("/", 1)[-1]
@@ -142,9 +150,25 @@ class RobloxUserRestriction(commands.Cog):
             async with session.patch(patchurl, json=payload, headers=self.headers) as res:
                 text = await res.text()
                 if res.status == 200:
-                    await ctx.send(f"✅ Un-banned <@{user_id}> (restriction `{rid}` lifted).")
+                    ban_embed = discord.Embed(
+                        title=f"⚠️ Game Ban Lifted — ID: {user_id}",
+                        color=discord.Color.from_rgb(252, 202, 98)
+                    )
+                    ban_embed.description = (
+                        f"**Banned for:** {reason}\n"
+                        f"**Original Duration:** {'Permanent' if permanent else duration}\n"
+                        f"**Restriction ID**: {rid}"
+                    )
+                    ban_embed.set_footer(
+                        text=f"Unbanned by {ctx.author}",
+                        icon_url=ctx.author.avatar.url  # or .avatar_url if on older discord.py
+                    )                   
+                    await ctx.send(embed=ban_embed)
                 else:
-                    await ctx.send(f"❌ Unban failed ({res.status}): {text}")
-
+                    ban_embed = discord.Embed(
+                        title="❌ Unban failed"
+                        color=discord.Color.red()
+                    )
+                    ban_embed.description = (f"({res.status}): {text}")
 async def setup(bot):
     await bot.add_cog(RobloxUserRestriction(bot))
