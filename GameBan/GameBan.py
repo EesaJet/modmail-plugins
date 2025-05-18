@@ -89,9 +89,11 @@ class RobloxUserRestriction(commands.Cog):
         async with aiohttp.ClientSession() as session:
             async with session.get(list_url, headers=self.headers) as list_res:
                 body = await list_res.text()
+                print(body)
                 if list_res.status != 200:
                     return await ctx.send(f"❌ Could not list restrictions ({list_res.status}): {body}")
                 data = await list_res.json()
+                print(data)
 
         # 2) find the first active restriction
         restriction = next(
