@@ -72,7 +72,21 @@ class RobloxUserRestriction(commands.Cog):
                     data = await res.json()
                     # data.path is "universes/{id}/user-restrictions/{restrictionId}"
                     rid = data["path"].rsplit("/", 1)[-1]
-                    await ctx.send(f"✅ Banned <@{user_id}> for {duration}: restriction id `{rid}`.")
+                    
+                    ban_embed = discord.Embed(
+                        title=f"⚠️ User Banned — ID: {user_id}",
+                        color=discord.Color.red()
+                    )
+                    ban_embed.description = (
+                        f"**Reason:** {reason}\n"
+                        f"**Duration:** {'Permanent' if permanent else duration}\n"
+                        f"Restriction ID: {rid}"
+                    )
+                    ban_embed.set_footer(
+                        text=f"Banned by {ctx.author}",
+                        icon_url=ctx.author.avatar_url  # or .avatar_url if on older discord.py
+                    )                   
+                    await ctx.send(embed=ban_embed)
                 else:
                     await ctx.send(f"❌ Ban failed ({res.status}): {text}")
 
