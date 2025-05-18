@@ -56,6 +56,10 @@ class RobloxUserRestriction(commands.Cog):
             }
         }
 
+        print(f"🔗 POST {self.base_url}")
+        print(f"   Headers: {self.headers}")
+        print(f"   Payload: {payload}")
+                
         async with aiohttp.ClientSession() as session:
             async with session.post(self.base_url, json=payload, headers=self.headers) as res:
                 text = await res.text()
