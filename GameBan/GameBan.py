@@ -10,12 +10,17 @@ from discord.ext import commands
 class RobloxUserRestriction(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        # your universe (game) ID
-        self.universe_id = int(os.getenv("ROBLOX_UNIVERSE_ID"))
-        # the API key you generated in Creator Hub
-        self.api_key = os.getenv("ROBLOX_API_KEY")
+        self.api_key     = os.getenv("ROBLOX_API_KEY")
+        self.universe_id = os.getenv("ROBLOX_UNIVERSE_ID")
+        
+        logging.info(f"🔑 ROBLOX_API_KEY = {self.api_key!r}")
+        logging.info(f"🌐 ROBLOX_UNIVERSE_ID = {self.universe_id!r}")
+
         if not self.api_key or not self.universe_id:
-            raise RuntimeError("Set ROBLOX_API_KEY and ROBLOX_UNIVERSE_ID env vars")
+            raise RuntimeError("Missing ROBLOX_API_KEY or ROBLOX_UNIVERSE_ID!")
+        
+        # convert universe_id to int now that we know it exists
+        self.universe_id = int(self.universe_id)
 
         self.base_url = f"https://apis.roblox.com/cloud/v2/universes/{self.universe_id}/user-restrictions"
         self.headers = {
