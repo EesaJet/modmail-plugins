@@ -17,7 +17,7 @@ class RobloxUserRestriction(commands.Cog):
             raise RuntimeError("Set ROBLOX_API_KEY and ROBLOX_UNIVERSE_ID env vars")
 
         print(os.getenv("ROBLOX_API_KEY"))
-        print(os.getenv"ROBLOX_UNIVERSE_ID")
+        print(os.getenv("ROBLOX_UNIVERSE_ID"))
 
         self.base_url = f"https://apis.roblox.com/cloud/v2/universes/{self.universe_id}/user-restrictions"
         self.headers = {
