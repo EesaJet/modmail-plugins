@@ -125,13 +125,12 @@ class RobloxUserRestriction(commands.Cog):
             print(f"   Payload: {payload}")
     
             # 4) send the PATCH to deactivate the ban
-            async with aiohttp.ClientSession() as session:
-                async with session.patch(patchurl, json=payload, headers=self.headers) as res:
-                    text = await res.text()
-                    if res.status == 200:
-                        await ctx.send(f"✅ Un-banned <@{user_id}> (restriction `{rid}` lifted).")
-                    else:
-                        await ctx.send(f"❌ Unban failed ({res.status}): {text}")
+            async with session.patch(patchurl, json=payload, headers=self.headers) as res:
+                text = await res.text()
+                if res.status == 200:
+                    await ctx.send(f"✅ Un-banned <@{user_id}> (restriction `{rid}` lifted).")
+                else:
+                    await ctx.send(f"❌ Unban failed ({res.status}): {text}")
 
 async def setup(bot):
     await bot.add_cog(RobloxUserRestriction(bot))
