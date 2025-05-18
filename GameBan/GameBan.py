@@ -109,6 +109,7 @@ class RobloxUserRestriction(commands.Cog):
         # 3) find active
         active = [r for r in entries
                   if r["gameJoinRestriction"].get("active")]
+        print(active)
         if not active:
             return await ctx.send("ℹ️ No active ban found for that user.")
         
