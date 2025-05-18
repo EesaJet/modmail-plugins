@@ -33,10 +33,9 @@ class RobloxUserRestriction(commands.Cog):
         Usage: !rban <user_id> <7d|24h|perm> <reason>
         """
         # parse duration
-        if duration.lower() == "perm":
-            duration_seconds = None  # 0 means permanent in this API
-        else:
-            unit = duration[-1].lower()
+        permanent = duration.lower() == "perm"
+        if not permanent:
+            unit   = duration[-1].lower()
             amount = int(duration[:-1])
             if unit == "d":
                 duration_seconds = amount * 86400
@@ -45,17 +44,18 @@ class RobloxUserRestriction(commands.Cog):
             else:
                 return await ctx.send("❌ Invalid duration. Use Nd, Nh, or perm.")
 
-        if duration_seconds != None:
-            duration = f"{duration_seconds}s"
-
-        payload = {
-            "gameJoinRestriction": {
+            restriction = {
                 "active":            True,
-                "duration":          {duration},
                 "privateReason":     reason,
                 "displayReason":     reason,
                 "excludeAltAccounts": True
             }
+
+        if not permanent:
+            restriction["duration"] = f"{duration_seconds}s"
+        
+        payload = {
+            "gameJoinRestriction": restriction
         }
 
         patchurl = f"{self.base_url}/{user_id}"
