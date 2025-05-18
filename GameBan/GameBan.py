@@ -46,7 +46,6 @@ class RobloxUserRestriction(commands.Cog):
                 return await ctx.send("❌ Invalid duration. Use Nd, Nh, or perm.")
 
         payload = {
-            "user": f"users/{user_id}",
             "gameJoinRestriction": {
                 "active":            True,
                 "duration":          f"{duration_seconds}s",
@@ -56,12 +55,14 @@ class RobloxUserRestriction(commands.Cog):
             }
         }
 
+        patchurl = f"{self.base_url}/{user_id}"
+
         print(f"🔗 POST {self.base_url}")
         print(f"   Headers: {self.headers}")
         print(f"   Payload: {payload}")
                 
         async with aiohttp.ClientSession() as session:
-            async with session.post(self.base_url, json=payload, headers=self.headers) as res:
+            async with session.patch(patchurl, json=payload, headers=self.headers) as res:
                 text = await res.text()
                 if res.status in (200,201):
                     data = await res.json()
