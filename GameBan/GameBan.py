@@ -34,7 +34,7 @@ class RobloxUserRestriction(commands.Cog):
         """
         # parse duration
         if duration.lower() == "perm":
-            duration_seconds = 0  # 0 means permanent in this API
+            duration_seconds = None  # 0 means permanent in this API
         else:
             unit = duration[-1].lower()
             amount = int(duration[:-1])
