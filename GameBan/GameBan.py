@@ -84,7 +84,7 @@ class RobloxUserRestriction(commands.Cog):
         Usage: ?runban <user_id>
         """
         # 1) fetch all restrictions for that user
-        list_url = f"{self.base_url}/users/{user_id}"
+        list_url = f"{self.base_url}/{user_id}"
         print(f"🔗 GET  {list_url}")
         async with aiohttp.ClientSession() as session:
             async with session.get(list_url, headers=self.headers) as list_res:
