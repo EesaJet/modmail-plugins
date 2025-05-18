@@ -45,7 +45,7 @@ class RobloxUserRestriction(commands.Cog):
             else:
                 return await ctx.send("❌ Invalid duration. Use Nd, Nh, or perm.")
 
-        if duration_seconds != None
+        if duration_seconds != None:
             duration = f"{duration_seconds}s"
 
         payload = {
