@@ -89,52 +89,49 @@ class RobloxUserRestriction(commands.Cog):
         async with aiohttp.ClientSession() as session:
             async with session.get(list_url, headers=self.headers) as list_res:
                 body = await list_res.text()
-                print(body)
+                print(body)  # raw JSON string
                 if list_res.status != 200:
                     return await ctx.send(f"❌ Could not list restrictions ({list_res.status}): {body}")
-                data = await list_res.json()
-                print(data)
-
-        async with session.get(list_url, headers=self.headers) as resp:
-            js = await resp.json()
-        
-        # 2) normalize to a Python list
-        if "data" in js:
-            entries = js["data"]
-        elif "gameJoinRestriction" in js:
-            entries = [js]
-        else:
-            entries = []
-        
-        # 3) find active
-        active = [r for r in entries
-                  if r["gameJoinRestriction"].get("active")]
-        print(active)
-        if not active:
-            return await ctx.send("ℹ️ No active ban found for that user.")
-        
-        restriction = active[0]
-        rid = restriction["path"].rsplit("/",1)[-1]
-        # … patch it …
     
-        # … now build your patch URL and payload as before …
-        rid = restriction["path"].rsplit("/", 1)[-1]
-        patchurl = f"{self.base_url}/{rid}?updateMask=gameJoinRestriction"
-
-        # 3) build the patch payload
-        payload = {"gameJoinRestriction": {"active": False}}
-        print(f"🔗 PATCH {patchurl}")
-        print(f"   Headers: {self.headers}")
-        print(f"   Payload: {payload}")
-
-        # 4) send the PATCH to deactivate the ban
-        async with aiohttp.ClientSession() as session:
-            async with session.patch(patchurl, json=payload, headers=self.headers) as res:
-                text = await res.text()
-                if res.status == 200:
-                    await ctx.send(f"✅ Un-banned <@{user_id}> (restriction `{rid}` lifted).")
-                else:
-                    await ctx.send(f"❌ Unban failed ({res.status}): {text}")
+                data = await list_res.json()
+                print(data)  # parsed JSON
+    
+            # 2) normalize into a Python list
+            if isinstance(data, dict) and "data" in data:
+                entries = data["data"]
+            elif isinstance(data, dict) and "gameJoinRestriction" in data:
+                entries = [data]
+            else:
+                entries = []
+    
+            # 3) filter for active bans
+            active = [
+                r for r in entries
+                if r.get("gameJoinRestriction", {}).get("active", False)
+            ]
+            if not active:
+                return await ctx.send("ℹ️ No active ban found for that user.")
+    
+            # 4) take the first active restriction and patch it inactive
+            restriction = active[0]
+            rid = restriction["path"].rsplit("/", 1)[-1]
+            
+            patchurl = f"{self.base_url}/{rid}?updateMask=gameJoinRestriction"
+    
+            # 3) build the patch payload
+            payload = {"gameJoinRestriction": {"active": False}}
+            print(f"🔗 PATCH {patchurl}")
+            print(f"   Headers: {self.headers}")
+            print(f"   Payload: {payload}")
+    
+            # 4) send the PATCH to deactivate the ban
+            async with aiohttp.ClientSession() as session:
+                async with session.patch(patchurl, json=payload, headers=self.headers) as res:
+                    text = await res.text()
+                    if res.status == 200:
+                        await ctx.send(f"✅ Un-banned <@{user_id}> (restriction `{rid}` lifted).")
+                    else:
+                        await ctx.send(f"❌ Unban failed ({res.status}): {text}")
 
 async def setup(bot):
     await bot.add_cog(RobloxUserRestriction(bot))
