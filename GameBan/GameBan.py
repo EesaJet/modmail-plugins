@@ -173,7 +173,14 @@ class RobloxUserRestriction(commands.Cog):
                         text=f"Unbanned by {ctx.author}",
                         icon_url=ctx.author.avatar.url  # or .avatar_url if on older discord.py
                     )                   
-                    await ctx.send(embed=ban_embed)
+                    view = View()
+                    view.add_item(
+                        Button(
+                            label="View Roblox Profile",
+                            url=f"https://www.roblox.com/users/{user_id}/profile"
+                        )
+                    )
+                    await ctx.send(embed=ban_embed, view=view)
                 else:
                     ban_embed = discord.Embed(
                         title="❌ Unban failed",
