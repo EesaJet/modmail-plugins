@@ -122,9 +122,6 @@ class RobloxUserRestriction(commands.Cog):
     
                 data = await list_res.json()
                 print(data)  # parsed JSON
-
-            reason_text  = data.get("privateReason")
-            duration_raw = data.get("duration") or data.get("expiresAt")
     
             # 2) normalize into a Python list
             if isinstance(data, dict) and "data" in data:
@@ -150,6 +147,12 @@ class RobloxUserRestriction(commands.Cog):
             rid = restriction["path"].rsplit("/", 1)[-1]
             
             patchurl = f"{self.base_url}/{rid}?updateMask=gameJoinRestriction"
+
+            # pull from the nested gameJoinRestriction
+            gjr = restriction["gameJoinRestriction"]
+            reason_text   = gjr.get("displayReason") or gjr.get("privateReason", "No reason provided")
+            duration_raw  = gjr.get("duration") or gjr.get("expiresAt")
+
     
             # 3) build the patch payload
             payload = {"gameJoinRestriction": {"active": False}}
@@ -167,6 +170,7 @@ class RobloxUserRestriction(commands.Cog):
                     )
                     ban_embed.description = (
                         f"**Banned for:** {reason_text}\n"
+                        f"**Original ban duration:** {duration_raw}\n"
                         f"**Restriction ID**: {rid}"
                     )
                     ban_embed.set_footer(
