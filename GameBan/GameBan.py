@@ -210,5 +210,60 @@ class RobloxUserRestriction(commands.Cog):
                         color=discord.Color.red()
                     )
                     ban_embed.description = (f"({res.status}): {text}")
+                    
+    @commands.command(name="gambanlist")
+    @commands.has_permissions(kick_members=True)
+    async def roblox_list(self, ctx):
+        """
+        List all active Roblox game‐join bans.
+        Usage: ?gambanlist
+        """
+        list_url = self.base_url  # GET /user‐restrictions returns all entries
+        async with aiohttp.ClientSession() as session:
+            async with session.get(list_url, headers=self.headers) as res:
+                text = await res.text()
+                if res.status != 200:
+                    return await ctx.send(f"❌ Could not retrieve bans ({res.status}): {text}")
+                data = await res.json()
+
+        entries = data.get("data", [])
+        # only keep active bans
+        active = [
+            e for e in entries
+            if e.get("gameJoinRestriction", {}).get("active", False)
+        ]
+
+        if not active:
+            empty = discord.Embed(
+                description="ℹ️ No active bans found.",
+                color=discord.Color.blue()
+            )
+            return await ctx.send(embed=empty)
+
+        # build the embed
+        embed = discord.Embed(
+            title="📝 Active Game Bans",
+            color=discord.Color.blue()
+        )
+
+        for e in active:
+            # extract the Roblox user ID
+            user_str = e["user"].split("/")[-1]
+            gjr = e["gameJoinRestriction"]
+
+            # reason & duration
+            reason = gjr.get("displayReason") or gjr.get("privateReason", "No reason provided")
+            raw    = gjr.get("duration")
+            duration = "Permanent" if not raw else raw
+
+            embed.add_field(
+                name=f"User {user_str}",
+                value=f"**Reason:** {reason}\n**Duration:** {duration}",
+                inline=False
+            )
+
+        # send to the invoking channel
+        await ctx.send(embed=embed)
+
 async def setup(bot):
     await bot.add_cog(RobloxUserRestriction(bot))
