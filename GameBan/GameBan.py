@@ -95,6 +95,9 @@ class RobloxUserRestriction(commands.Cog):
                         )
                     )
                     await ctx.send(embed=ban_embed, view=view)
+                    log_ch = self.bot.get_channel(455207881747464192)
+                    if log_ch:
+                        await log_ch.send(embed=ban_embed, view=view)
                 else:
                     ban_embed = discord.Embed(
                         title="❌ Ban failed",
@@ -198,6 +201,9 @@ class RobloxUserRestriction(commands.Cog):
                         )
                     )
                     await ctx.send(embed=ban_embed, view=view)
+                    log_ch = self.bot.get_channel(455207881747464192)
+                    if log_ch:
+                        await log_ch.send(embed=ban_embed, view=view)
                 else:
                     ban_embed = discord.Embed(
                         title="❌ Unban failed",
