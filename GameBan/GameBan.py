@@ -211,7 +211,7 @@ class RobloxUserRestriction(commands.Cog):
                     )
                     ban_embed.description = (f"({res.status}): {text}")
                     
-    @commands.command(name="gambanlist")
+    @commands.command(name="gamebanlist")
     @commands.has_permissions(kick_members=True)
     async def roblox_list(self, ctx):
         """
