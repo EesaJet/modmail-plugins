@@ -183,7 +183,7 @@ class RobloxUserRestriction(commands.Cog):
                     )
                     ban_embed.description = (
                         f"**Banned for:** {reason_text}\n"
-                        f"**Original ban duration:** {duration_raw}\n"
+                        f"**Original ban duration:** {duration_text}\n"
                         f"**Restriction ID**: {rid}"
                     )
                     ban_embed.set_footer(
