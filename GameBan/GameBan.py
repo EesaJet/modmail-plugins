@@ -26,12 +26,12 @@ class RobloxUserRestriction(commands.Cog):
             "Content-Type": "application/json"
         }
 
-    @commands.command(name="rban")
+    @commands.command(name="gameban")
     @commands.has_permissions(kick_members=True)
     async def roblox_ban(self, ctx, user_id: int, duration: str, *, reason: str):
         """
         Ban a Roblox user from joining your game.
-        Usage: !rban <user_id> <7d|24h|perm> <reason>
+        Usage: !gameban <user_id> <7d|24h|perm> <reason>
         """
         # parse duration
         permanent = duration.lower() == "perm"
@@ -106,12 +106,12 @@ class RobloxUserRestriction(commands.Cog):
                     ban_embed.description = (f"({res.status}): {text}")
                     await ctx.send(embed=ban_embed)
 
-    @commands.command(name="runban")
+    @commands.command(name="gameunban")
     @commands.has_permissions(kick_members=True)
     async def roblox_unban(self, ctx, user_id: int):
         """
         Lift any active ban on this user.
-        Usage: ?runban <user_id>
+        Usage: ?gameunban <user_id>
         """
         # 1) fetch all restrictions for that user
         list_url = f"{self.base_url}/{user_id}"
