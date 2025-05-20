@@ -150,10 +150,23 @@ class RobloxUserRestriction(commands.Cog):
 
             # pull from the nested gameJoinRestriction
             gjr = restriction["gameJoinRestriction"]
-            reason_text   = gjr.get("displayReason") or gjr.get("privateReason", "No reason provided")
-            duration_raw  = gjr.get("duration") or gjr.get("expiresAt")
+            reason_text  = gjr.get("displayReason") or gjr.get("privateReason", "No reason provided")
+            
+            # turn "3600s" → "1h", "86400s" → "1d", or Permanent
+            raw = gjr.get("duration")
+            if raw:
+                secs = int(raw.rstrip("s"))
+                days, rem = divmod(secs, 86400)
+                hours, rem = divmod(rem, 3600)
+                mins = rem // 60
+                parts = []
+                if days:  parts.append(f"{days}d")
+                if hours: parts.append(f"{hours}h")
+                if mins:  parts.append(f"{mins}m")
+                duration_text = " ".join(parts) if parts else "0s"
+            else:
+                duration_text = "Permanent"
 
-    
             # 3) build the patch payload
             payload = {"gameJoinRestriction": {"active": False}}
             print(f"🔗 PATCH {patchurl}")
