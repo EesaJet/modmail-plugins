@@ -285,7 +285,7 @@ class RobloxUserRestriction(commands.Cog):
     
             embed.add_field(
                 name=f"User {user_id}",
-                value=f"**Reason:** {reason}\n**Duration:** {dur}",
+                value=f"**Reason:** {reason}\n**Duration:** {duration_text}",
                 inline=False
             )
     
