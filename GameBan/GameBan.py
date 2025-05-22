@@ -269,7 +269,19 @@ class RobloxUserRestriction(commands.Cog):
             user_id = entry["user"].split("/")[-1]
             gjr     = entry["gameJoinRestriction"]
             reason  = gjr.get("displayReason") or gjr.get("privateReason", "No reason")
-            dur     = gjr.get("duration") or "Permanent"
+            dur     = gjr.get("duration")
+            if dur:
+                secs = int(dur.rstrip("s"))
+                days, rem = divmod(secs, 86400)
+                hours, rem = divmod(rem, 3600)
+                mins = rem // 60
+                parts = []
+                if days:  parts.append(f"{days}d")
+                if hours: parts.append(f"{hours}h")
+                if mins:  parts.append(f"{mins}m")
+                duration_text = " ".join(parts) if parts else "0s"
+            else:
+                duration_text = "Permanent"
     
             embed.add_field(
                 name=f"User {user_id}",
