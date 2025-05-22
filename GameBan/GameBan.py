@@ -238,7 +238,7 @@ class RobloxUserRestriction(commands.Cog):
     async def roblox_list(self, ctx):
         """
         List all active Roblox game‐join bans.
-        Usage: ?gambanlist
+        Usage: ?gambanlist`````````````
         """
         list_url = self.base_url  # GET /user‐restrictions returns all entries
         async with aiohttp.ClientSession() as session:
@@ -251,8 +251,8 @@ class RobloxUserRestriction(commands.Cog):
         entries = data.get("data", [])
         # only keep active bans
         active = [
-            e for e in entries
-            if e.get("gameJoinRestriction", {}).get("active", False)
+            r for r in entries
+            if r.get("gameJoinRestriction", {}).get("active", False)
         ]
 
         if not active:
@@ -268,10 +268,11 @@ class RobloxUserRestriction(commands.Cog):
             color=discord.Color.blue()
         )
 
-        for e in active:
+        for r in active:
             # extract the Roblox user ID
-            user_str = e["user"].split("/")[-1]
-            gjr = e["gameJoinRestriction"]
+            restriction = active[0]
+            user_str = restriction["user"].split("/")[-1]
+            gjr = restriction["gameJoinRestriction"]
 
             # reason & duration
             reason = gjr.get("displayReason") or gjr.get("privateReason", "No reason provided")
