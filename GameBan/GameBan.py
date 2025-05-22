@@ -78,7 +78,7 @@ class RobloxUserRestriction(commands.Cog):
                     # data.path is "universes/{id}/user-restrictions/{restrictionId}"
                     rid = data["path"].rsplit("/", 1)[-1]
                 else:
-                    await ctx.send(f"❌ Could not retrieve bans ({res.status}): {text}")
+                    await ctx.send(f"❌ Could not ban from Palm Beach ({res.status}): {text}")
                     
             async with session.patch(patchurl, json=payload, headers=self.headers) as res:
                 text = await res.text()
@@ -128,6 +128,8 @@ class RobloxUserRestriction(commands.Cog):
         """
         # 1) fetch all restrictions for that user
         list_url = f"{self.base_url}/{user_id}"
+
+        
         print(f"🔗 GET  {list_url}")
         async with aiohttp.ClientSession() as session:
             async with session.get(list_url, headers=self.headers) as list_res:
@@ -163,6 +165,7 @@ class RobloxUserRestriction(commands.Cog):
             rid = restriction["path"].rsplit("/", 1)[-1]
             
             patchurl = f"{self.base_url}/{rid}?updateMask=gameJoinRestriction"
+            secondpatchurl = f"{self.second_url}/{rid}?updateMask=gameJoinRestriction"
 
             # pull from the nested gameJoinRestriction
             gjr = restriction["gameJoinRestriction"]
@@ -190,6 +193,12 @@ class RobloxUserRestriction(commands.Cog):
             print(f"   Payload: {payload}")
     
             # 4) send the PATCH to deactivate the ban
+
+            async with session.patch(secondpatchurl, json=payload, headers=self.headers) as res:
+                text = await res.text()
+                if res.status !== 200:
+                    await.ctx.send(f"❌ Could not ban from Palm Beach ({res.status}): {text}")
+            
             async with session.patch(patchurl, json=payload, headers=self.headers) as res:
                 text = await res.text()
                 if res.status == 200:
