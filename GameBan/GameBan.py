@@ -253,7 +253,11 @@ class RobloxUserRestriction(commands.Cog):
             e for e in entries
             if e.get("gameJoinRestriction", {}).get("active", False)
         ]
-    
+
+        print(data)
+        print(entries)
+        print(active)
+        
         if not active:
             return await ctx.send(embed=discord.Embed(
                 description="ℹ️ No active bans found.",
