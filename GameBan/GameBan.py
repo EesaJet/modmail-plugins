@@ -240,7 +240,7 @@ class RobloxUserRestriction(commands.Cog):
         List all active Roblox game‐join bans.
         Usage: ?gambanlist`````````````
         """
-        list_url = self.base_url  # GET /user‐restrictions returns all entries
+        list_url = f"{self.base_url}/users"  # GET /user‐restrictions returns all entries
         async with aiohttp.ClientSession() as session:
             async with session.get(list_url, headers=self.headers) as res:
                 text = await res.text()
