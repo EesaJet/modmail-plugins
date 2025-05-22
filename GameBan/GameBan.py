@@ -20,7 +20,7 @@ class RobloxUserRestriction(commands.Cog):
 
         print(os.getenv("ROBLOX_API_KEY"))
         print(os.getenv("ROBLOX_UNIVERSE_ID"))
-        print(os.getenv("ROBLOX_SECOND_UNIVERSE_ID")
+        print(os.getenv("ROBLOX_SECOND_UNIVERSE_ID"))
               
         self.base_url = f"https://apis.roblox.com/cloud/v2/universes/{self.universe_id}/user-restrictions"
         self.second_url = f"https://apis.roblox.com/cloud/v2/universes/{self.second_universe_id}/user-restrictions"
