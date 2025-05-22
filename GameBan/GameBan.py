@@ -77,6 +77,8 @@ class RobloxUserRestriction(commands.Cog):
                     data = await res.json()
                     # data.path is "universes/{id}/user-restrictions/{restrictionId}"
                     rid = data["path"].rsplit("/", 1)[-1]
+                else:
+                    await ctx.send(f"❌ Could not retrieve bans ({res.status}): {text}")
                     
             async with session.patch(patchurl, json=payload, headers=self.headers) as res:
                 text = await res.text()
