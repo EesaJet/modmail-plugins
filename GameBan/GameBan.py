@@ -196,7 +196,7 @@ class RobloxUserRestriction(commands.Cog):
 
             async with session.patch(secondpatchurl, json=payload, headers=self.headers) as res:
                 text = await res.text()
-                if res.status !== 200:
+                if res.status != 200:
                     await.ctx.send(f"❌ Could not unban from Palm Beach ({res.status}): {text}")
             
             async with session.patch(patchurl, json=payload, headers=self.headers) as res:
