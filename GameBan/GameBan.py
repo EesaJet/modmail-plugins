@@ -248,7 +248,7 @@ class RobloxUserRestriction(commands.Cog):
                     return await ctx.send(f"❌ Could not retrieve bans ({res.status}): {body}")
                 data = await res.json()
     
-        entries = data.get("data", [])
+        entries = data.get("userRestrictions", [])
         active  = [
             e for e in entries
             if e.get("gameJoinRestriction", {}).get("active", False)
