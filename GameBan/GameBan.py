@@ -12,15 +12,18 @@ class RobloxUserRestriction(commands.Cog):
         self.bot = bot
         # your universe (game) ID
         self.universe_id = int(os.getenv("ROBLOX_UNIVERSE_ID"))
+        self.second_universe_id = int(os.getenv("ROBLOX_SECOND_UNIVERSE_ID"))
         # the API key you generated in Creator Hub
         self.api_key = os.getenv("ROBLOX_API_KEY")
-        if not self.api_key or not self.universe_id:
+        if not self.api_key or not self.universe_id or not self.second_universe_id:
             raise RuntimeError("Set ROBLOX_API_KEY and ROBLOX_UNIVERSE_ID env vars")
 
         print(os.getenv("ROBLOX_API_KEY"))
         print(os.getenv("ROBLOX_UNIVERSE_ID"))
-
+        print(os.getenv("ROBLOX_SECOND_UNIVERSE_ID")
+              
         self.base_url = f"https://apis.roblox.com/cloud/v2/universes/{self.universe_id}/user-restrictions"
+        self.second_url = f"https://apis.roblox.com/cloud/v2/universes/{self.second_universe_id}/user-restrictions"
         self.headers = {
             "x-api-key":    self.api_key,
             "Content-Type": "application/json"
@@ -61,12 +64,20 @@ class RobloxUserRestriction(commands.Cog):
         }
 
         patchurl = f"{self.base_url}/{user_id}"
+        secondpatchurl = f"{self.second_url}/{user_id}"
 
         print(f"🔗 POST {self.base_url}")
         print(f"   Headers: {self.headers}")
         print(f"   Payload: {payload}")
                 
         async with aiohttp.ClientSession() as session:
+             async with session.patch(secondpatchurl, json=payload, headers=self.headers) as res:
+                text = await res.text()
+                if res.status in (200,201):
+                    data = await res.json()
+                    # data.path is "universes/{id}/user-restrictions/{restrictionId}"
+                    rid = data["path"].rsplit("/", 1)[-1]
+                    
             async with session.patch(patchurl, json=payload, headers=self.headers) as res:
                 text = await res.text()
                 if res.status in (200,201):
