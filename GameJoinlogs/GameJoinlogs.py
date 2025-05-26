@@ -36,7 +36,8 @@ class GameJoinlogs(commands.Cog):
                         if key in combined:
                             new_embed = discord.Embed(
                                 title = embed.title,
-                                desc = embed.description,
+                                desc = embed.description
+                            )
                             await message.channel.send(embed=new_embed)
                             #await message.delete()        # ← delete the original embed message
                             return
