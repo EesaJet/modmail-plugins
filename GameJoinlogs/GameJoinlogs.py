@@ -1,9 +1,8 @@
 from discord.ext import commands, tasks
 from datetime import datetime, timedelta
-import pytz
-import math
-import json
-import discord
+import pytz, math, json, discord, re
+from discord.ui import View, Button
+
 
 class GameJoinlogs(commands.Cog):
     """Reacts with specific emojis and manages deadlines."""
@@ -26,20 +25,34 @@ class GameJoinlogs(commands.Cog):
                 title = embed.title or ""
                 desc  = embed.description or ""
                 combined = f"{title}\n{desc}".lower()
-
+                    
                 # 2) “Shift on <location>” announcer
                 if "joined" in combined:
                     for key, (place_name, game_link) in location_map.items():
                         if key in combined:
+
                             new_embed = discord.Embed(
                                 title = embed.title,
-                                description = embed.description
+                                description = embed.description,
+                                footer = embed.footer
                             )
+            
+                            game_link = location_map[key][1]
+            
+                            match = re.search(r"User ID:\s*(\d+)", desc)
+                            profile_url = None
+                            if match:
+                                profile_url = f"https://www.roblox.com/users/{match.group(1)}/profile"
+            
+                            view = View()
+                            view.add_item(Button(label="View Game",    url=game_link))
+                            if profile_url:
+                                view.add_item(Button(label="View Profile", url=profile_url))
+                            
                             await message.channel.send(embed=new_embed)
                             #await message.delete()        # ← delete the original embed message
                             return
                             
-                #await message.delete()        # ← delete the original embed message
                 return
                 
 async def setup(bot):
