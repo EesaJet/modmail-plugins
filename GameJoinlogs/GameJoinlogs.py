@@ -48,7 +48,7 @@ class GameJoinlogs(commands.Cog):
                             if profile_url:
                                 view.add_item(Button(label="View Profile", url=profile_url))
                             
-                            await message.channel.send(embed=new_embed, view-view)
+                            await message.channel.send(embed=new_embed, view=view)
                             #await message.delete()        # ← delete the original embed message
                             return
                             
