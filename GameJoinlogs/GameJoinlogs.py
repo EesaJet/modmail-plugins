@@ -21,22 +21,19 @@ class GameJoinlogs(commands.Cog):
             "northpark":   ("Northpark C Line",        "https://www.roblox.com/games/2337773502/Northpark-C-Line"),
         }
         if message.channel.id == 1157420902951166046 and message.author.id == 1157437939475828827:
-            # map of location keywords → (display name, game link)
-            original = message.embeds[0]
-            
+            # map of location keywords → (display name, game link)            
             for embed in message.embeds:
                 title = embed.title or ""
                 desc  = embed.description or ""
                 combined = f"{title}\n{desc}".lower()
 
-                
                 # 2) “Shift on <location>” announcer
                 if "joined" in combined:
                     for key, (place_name, game_link) in location_map.items():
                         if key in combined:
                             new_embed = discord.Embed(
                                 title = embed.title,
-                                desc = embed.description
+                                description = embed.description
                             )
                             await message.channel.send(embed=new_embed)
                             #await message.delete()        # ← delete the original embed message
