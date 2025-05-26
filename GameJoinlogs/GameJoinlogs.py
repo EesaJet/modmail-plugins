@@ -34,7 +34,6 @@ class GameJoinlogs(commands.Cog):
                             new_embed = discord.Embed(
                                 title = embed.title,
                                 description = embed.description,
-                                footer = embed.footer
                             )
             
                             game_link = location_map[key][1]
