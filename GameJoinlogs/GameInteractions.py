@@ -30,7 +30,7 @@ class GameInteractions(commands.Cog):
         user_id = int(user_id_str)
 
         # 4) acknowledge the click immediately
-        await interaction.response.defer(ephemeral=True)
+        await interaction.response.followup.send(f"Succesffuly banned", ephermal=True)
 
         # 5) call your ban‐cog’s command directly
         ban_cog = self.bot.get_cog("RobloxUserRestriction")
