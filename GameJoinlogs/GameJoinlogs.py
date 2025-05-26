@@ -40,10 +40,10 @@ class GameJoinlogs(commands.Cog):
                                 f"**Game Link: 🔗** {game_link}\n"
                                 "<@&1237844151525969930>"
                             )
-                            await message.delete()        # ← delete the original embed message
+                            #await message.delete()        # ← delete the original embed message
                             return
                             
-                await message.delete()        # ← delete the original embed message
+                #await message.delete()        # ← delete the original embed message
                 return
                 
 async def setup(bot):
