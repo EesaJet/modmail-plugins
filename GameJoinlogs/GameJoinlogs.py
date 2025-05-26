@@ -38,15 +38,19 @@ class GameJoinlogs(commands.Cog):
             
                             game_link = location_map[key][1]
             
-                            match = re.search(r"User ID:\s*(\d+)", desc)
-                            profile_url = None
-                            if match:
-                                profile_url = f"https://www.roblox.com/users/{match.group(1)}/profile"
-                            print(profile_url)
+                            user_id = None
+                            for line in desc.splitlines():
+                                if line.lower().startswith("user id"):
+                                    # split on ":" then filter digits
+                                    parts = line.split(": ", 1)
+                                    user_id = "".join(filter(str.isdigit, parts[1]))
+                                    break
+                                print(user_id)
                             
                             view = View()
                             view.add_item(Button(label="View Game",    url=game_link))
-                            if profile_url:
+                            if user_id:
+                                profile_url = f"https://www.roblox.com/users/{user_id}/profile"
                                 view.add_item(Button(label="View Profile", url=profile_url))
                             
                             await message.channel.send(embed=new_embed, view=view)
