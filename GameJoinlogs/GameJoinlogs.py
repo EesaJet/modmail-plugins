@@ -34,12 +34,10 @@ class GameJoinlogs(commands.Cog):
                 if "joined" in combined:
                     for key, (place_name, game_link) in location_map.items():
                         if key in combined:
-                            await message.channel.send(
-                                f"📢 **Shift on {place_name}**\n\n"
-                                f"{desc}\n\n"
-                                f"**Game Link: 🔗** {game_link}\n"
-                                "<@&1237844151525969930>"
-                            )
+                            new_embed = discord.Embed(
+                                title = embed.title,
+                                desc = embed.description,
+                            await message.channel.send(embed=new_embed)
                             #await message.delete()        # ← delete the original embed message
                             return
                             
