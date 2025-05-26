@@ -36,7 +36,7 @@ class GameJoinlogs(commands.Cog):
                         if key in combined:
                             await message.channel.send(
                                 f"📢 **Shift on {place_name}**\n\n"
-                                f"{filtered_desc}\n\n"
+                                f"{desc}\n\n"
                                 f"**Game Link: 🔗** {game_link}\n"
                                 "<@&1237844151525969930>"
                             )
