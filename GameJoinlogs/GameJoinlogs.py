@@ -42,7 +42,8 @@ class GameJoinlogs(commands.Cog):
                             profile_url = None
                             if match:
                                 profile_url = f"https://www.roblox.com/users/{match.group(1)}/profile"
-            
+                            print(profile_url)
+                            
                             view = View()
                             view.add_item(Button(label="View Game",    url=game_link))
                             if profile_url:
