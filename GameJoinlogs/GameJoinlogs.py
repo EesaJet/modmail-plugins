@@ -1,50 +1,50 @@
-import os
-import aiohttp
-from aiohttp import web
+from discord.ext import commands, tasks
+from datetime import datetime, timedelta
+import pytz
+import math
+import json
 import discord
-from discord.ext import commands
 
-LOG_CHANNEL_ID = 1157420902951166046  # your channel
+class GameJoinlogs(commands.Cog):
+    """Reacts with specific emojis and manages deadlines."""
 
-class JoinLogger(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.channel_id = 466682606373830657
 
-        # set up aiohttp
-        self.app    = web.Application()
-        self.app.router.add_post("/join", self._on_player_join)
-        self.runner = web.AppRunner(self.app)
-        # fire it off in the bot’s loop
-        bot.loop.create_task(self._start_webserver())
+    @commands.Cog.listener()
+    async def on_message(self, message):
+    # Group shout + Shift-watcher
+        location_map = {
+            "cornwall":    ("Cornwall",                "https://www.roblox.com/games/4986113387/UPDATE-The-West-Cornwall-Project"),
+            "palm beach":  ("Palm Beach Resort & Spa", "https://www.roblox.com/games/14918591976/Palm-Beach-Resort-Spa"),
+            "northpark":   ("Northpark C Line",        "https://www.roblox.com/games/2337773502/Northpark-C-Line"),
+        }
+        if message.channel.id == 1157420902951166046 and message.author.id == 1157437939475828827:
+            # map of location keywords → (display name, game link)
+            original = message.embeds[0]
+            
+            for embed in message.embeds:
+                title = embed.title or ""
+                desc  = embed.description or ""
+                combined = f"{title}\n{desc}".lower()
 
-    async def _start_webserver(self):
-        await self.runner.setup()
-        site = web.TCPSite(self.runner, "0.0.0.0", int(os.getenv("JOIN_LOG_PORT", 8080)))
-        await site.start()
-        print(f"[JoinLogger] HTTP server running on port {site._port}")
-
-    async def _on_player_join(self, request: web.Request):
-        data = await request.json()
-        # extract your fields
-        user_id   = data.get("userId")
-        username  = data.get("username")
-        place_id  = data.get("placeId")
-        ts        = data.get("time")
-
-        chan = self.bot.get_channel(LOG_CHANNEL_ID)
-        if chan:
-            embed = discord.Embed(
-                title="🚪 Player Joined",
-                color=discord.Color.green()
-            )
-            embed.add_field("Username", username, inline=True)
-            embed.add_field("UserId",  user_id,  inline=True)
-            embed.add_field("PlaceId", place_id, inline=True)
-            embed.set_footer(text=f"Timestamp: {ts}")
-            await chan.send(embed=embed)
-
-        return web.Response(text="ok")
-
+                
+                # 2) “Shift on <location>” announcer
+                if "joined" in combined:
+                    for key, (place_name, game_link) in location_map.items():
+                        if key in combined:
+                            await message.channel.send(
+                                f"📢 **Shift on {place_name}**\n\n"
+                                f"{filtered_desc}\n\n"
+                                f"**Game Link: 🔗** {game_link}\n"
+                                "<@&1237844151525969930>"
+                            )
+                            await message.delete()        # ← delete the original embed message
+                            return
+                            
+                await message.delete()        # ← delete the original embed message
+                return
+                
 async def setup(bot):
-    await bot.add_cog(JoinLogger(bot))
-
+    await bot.add_cog(GameJoinlogs(bot))
