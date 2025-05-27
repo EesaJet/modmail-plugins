@@ -49,7 +49,7 @@ class GameInteractions(commands.Cog):
       new_view = View()
       
       for row in old_rows:
-         for comp in row.components:
+         for comp in row.children:
             # if it’s our Ban button, disable it
             if getattr(comp, "custom_id", "") == cid:
                new_view.add_item(
