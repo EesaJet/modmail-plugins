@@ -9,8 +9,8 @@ class GameInteractions(commands.Cog):
 
    @commands.Cog.listener()
    async def on_interaction(self, interaction: discord.Interaction):
-       if interaction.type is not discord.InteractionType.component:
-           return
+       #if interaction.type is not discord.InteractionType.component:
+           #return
 
        cid = interaction.data.get("custom_id", "")
        if not cid.startswith("exp_") or not cid.endswith("_gameban"):
