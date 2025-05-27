@@ -40,8 +40,9 @@ class GameInteractions(commands.Cog):
       print(ctx)
 
       # 4) Finally invoke the command machinery
-      await self.bot.invoke(ctx)   
-
+      await self.bot.invoke(ctx)
+      
+      ban_cog = self.bot.get_cog("RobloxUserRestriction")
       success = await ban_cog.roblox_ban(interaction, user_id, "perm", reason="Banned via button")
 
       old_rows = interaction.message.components  # list of ActionRow
