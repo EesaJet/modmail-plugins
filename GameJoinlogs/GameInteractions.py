@@ -3,15 +3,6 @@ from datetime import datetime, timedelta
 import pytz, math, json, discord, re, asyncio
 from discord.ui import View, Button
 
-
-class GameInteractions(commands.Cog):
-    """Reacts with specific emojis and manages deadlines."""
-
-    def __init__(self, bot):
-        self.bot = bot
-        self.channel_id = 466682606373830657
-
-    @commands.Cog.listener()
  class GameBanClickListener(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
