@@ -14,10 +14,10 @@ class GameInteractions(commands.Cog):
 
       cid = interaction.data.get("custom_id", "")
       print(cid)
-      if not cid.startswith("exp_") or not cid.endswith("_gameban"):
+      if not cid.startswith("expgb_") or not cid.endswith("_gameban"):
          return
 
-      user_id_str = cid[len("exp_"):-len("_gameban")]
+      user_id_str = cid[len("expgb_"):-len("_gameban")]
       print(user_id_str)
       if not user_id_str.isdigit():
          return
