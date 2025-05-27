@@ -43,6 +43,8 @@ class GameInteractions(commands.Cog):
       await self.bot.invoke(ctx)
 
       # 5) (Optional) send a private followup so the clicker knows it ran
+      
+      await interaction.response.defer(ephemeral=True)
       await interaction.response.send_message(
          f"<:ban_hammer:918264271090106379> Successfully game banned `{user_id}`", 
          ephemeral=True
@@ -74,10 +76,7 @@ class GameInteractions(commands.Cog):
                   )
                )
                
-      await interaction.followup.edit_message(
-         message_id=interaction.message.id,
-         view=new_view
-      )
+      await interaction.followup.edit_message(interaction.message.id, view=new_view)
       
 async def setup(bot):
     await bot.add_cog(GameInteractions(bot))
