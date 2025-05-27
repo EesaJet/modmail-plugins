@@ -41,7 +41,9 @@ class GameInteractions(commands.Cog):
 
       # 4) Finally invoke the command machinery
       await self.bot.invoke(ctx)   
-      
+
+      success = await ban_cog.roblox_ban(interaction, user_id, "perm", reason="Banned via button")
+
       old_rows = interaction.message.components  # list of ActionRow
       new_view = View()
       
@@ -67,11 +69,12 @@ class GameInteractions(commands.Cog):
                      disabled=False
                   )
                )
-               
-      await interaction.followup.edit_message(
-           message_id=interaction.message.id,
-           view=new_view
-       )
+
+      if success: 
+         await interaction.followup.edit_message(
+              message_id=interaction.message.id,
+              view=new_view
+          )
       
 async def setup(bot):
     await bot.add_cog(GameInteractions(bot))
