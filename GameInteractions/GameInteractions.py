@@ -43,8 +43,11 @@ class GameInteractions(commands.Cog):
       await self.bot.invoke(ctx)
 
       # 5) (Optional) send a private followup so the clicker knows it ran
-      await interaction.followup.send(f"<:ban_hammer:918264271090106379> Successfully game banned player with User ID: `{user_id}`", ephemeral=True)
-
+      await interaction.response.send_message(
+         f"<:ban_hammer:918264271090106379> Successfully game banned `{user_id}`", 
+         ephemeral=True
+      )
+      
       old_rows = interaction.message.components  # list of ActionRow
       new_view = View()
       
