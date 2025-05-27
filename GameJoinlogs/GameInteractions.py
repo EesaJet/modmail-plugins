@@ -53,4 +53,4 @@ class GameInteractions(commands.Cog):
         await interaction.followup.send(f"🔨 Issued `?gameban {user_id}`", ephemeral=True)
                 
 async def setup(bot):
-    await bot.add_cog(GameInteractions(bot))
+    await bot.add_cog(GameBanClickListener(bot))
