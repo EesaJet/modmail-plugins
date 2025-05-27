@@ -24,11 +24,13 @@ class GameInteractions(commands.Cog):
         cid = interaction.data.get("custom_id", "")
         if not cid.startswith("exp_") or not cid.endswith("_gameban"):
             return
+        print(cid)
 
         user_id_str = cid[len("exp_"):-len("_gameban")]
         if not user_id_str.isdigit():
             return
         user_id = int(user_id_str)
+        print(user_id)
 
         # 1) Ack immediately so the button doesn't spin forever
         await interaction.response.defer(ephemeral=True)
@@ -42,6 +44,7 @@ class GameInteractions(commands.Cog):
 
         # 3) Get a Context from that fake message...
         ctx = await self.bot.get_context(fake)
+        print(ctx)
 
         # 4) Finally invoke the command machinery
         await self.bot.invoke(ctx)
