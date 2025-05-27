@@ -1,6 +1,6 @@
 from discord.ext import commands, tasks
 from datetime import datetime, timedelta
-import pytz, math, json, discord, re
+import pytz, math, json, discord, re, asyncio
 from discord.ui import View, Button
 
 
@@ -12,45 +12,42 @@ class GameInteractions(commands.Cog):
         self.channel_id = 466682606373830657
 
     @commands.Cog.listener()
+ class GameBanClickListener(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+
+    @commands.Cog.listener()
     async def on_interaction(self, interaction: discord.Interaction):
-        # 1) only care about component interactions (buttons / selects)
         if interaction.type is not discord.InteractionType.component:
             return
 
-        custom_id = interaction.data.get("custom_id", "")
-        # 2) must match exp_<digits>_gameban
-        if not custom_id.startswith("exp_") or not custom_id.endswith("_gameban"):
+        cid = interaction.data.get("custom_id", "")
+        if not cid.startswith("exp_") or not cid.endswith("_gameban"):
             return
 
-        # 3) extract the Roblox user ID in between
-        user_id_str = custom_id[len("exp_"):-len("_gameban")]
+        user_id_str = cid[len("exp_"):-len("_gameban")]
         if not user_id_str.isdigit():
-            return  # sanity
-
+            return
         user_id = int(user_id_str)
 
-        # 4) acknowledge the click immediately
-        await interaction.response.followup.send(f"Succesffuly banned", ephermal=True)
+        # 1) Ack immediately so the button doesn't spin forever
+        await interaction.response.defer(ephemeral=True)
 
-        # 5) call your ban‐cog’s command directly
-        ban_cog = self.bot.get_cog("RobloxUserRestriction")
-        if not ban_cog:
-            return await interaction.followup.send(
-                "❌ Ban subsystem is not loaded.", ephemeral=True
-            )
+        # 2) Build a fake message context to invoke your prefix command
+        #    We hijack the original message object for simplicity:
+        fake = interaction.message
+        fake.author = interaction.user
+        # assuming your bot’s prefix is "?"
+        fake.content = f"?gameban {user_id} perm Banned via button"
 
-        # Here we invoke your existing ban logic.
-        # We're assuming you want a permanent ban, but you can adjust:
-        try:
-            # Note: we're passing the Interaction as 'ctx', since it has send methods
-            await ban_cog.roblox_ban(
-                interaction,               # this will act like a Context
-                user_id,
-                "perm",                    # duration
-                reason="Banned via button" # or whatever default
-            )
-        except Exception as e:
-            await interaction.followup.send(f"❌ Failed to ban: {e}", ephemeral=True)
+        # 3) Get a Context from that fake message...
+        ctx = await self.bot.get_context(fake)
+
+        # 4) Finally invoke the command machinery
+        await self.bot.invoke(ctx)
+
+        # 5) (Optional) send a private followup so the clicker knows it ran
+        await interaction.followup.send(f"🔨 Issued `?gameban {user_id}`", ephemeral=True)
                 
 async def setup(bot):
     await bot.add_cog(GameInteractions(bot))
