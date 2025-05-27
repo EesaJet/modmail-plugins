@@ -74,7 +74,10 @@ class GameInteractions(commands.Cog):
                   )
                )
                
-      await interaction.message.edit(view=new_view)
-                
+      await interaction.followup.edit_message(
+         message_id=interaction.message.id,
+         view=new_view
+      )
+      
 async def setup(bot):
     await bot.add_cog(GameInteractions(bot))
