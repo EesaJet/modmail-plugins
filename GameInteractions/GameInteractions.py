@@ -54,8 +54,9 @@ class GameInteractions(commands.Cog):
             if getattr(comp, "custom_id", "") == cid:
                new_view.add_item(
                   Button(
-                     style=ButtonStyle.primary,
+                     style=ButtonStyle.danger,
                      label=comp.label,
+                     emoji=comp.emoji,
                      custom_id=comp.custom_id,
                      disabled=True
                      )
