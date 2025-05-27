@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import pytz, math, json, discord, re, asyncio
 from discord.ui import View, Button
 
-class GameBanClickListener(commands.Cog):
+class GameInteractions(commands.Cog):
    def __init__(self, bot):
        self.bot = bot
 
@@ -44,4 +44,4 @@ class GameBanClickListener(commands.Cog):
        await interaction.followup.send(f"🔨 Issued `?gameban {user_id}`", ephemeral=True)
                 
 async def setup(bot):
-    await bot.add_cog(GameBanClickListener(bot))
+    await bot.add_cog(GameInteractions(bot))
