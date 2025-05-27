@@ -2,6 +2,7 @@ from discord.ext import commands, tasks
 from datetime import datetime, timedelta
 import pytz, math, json, discord, re, asyncio
 from discord.ui import View, Button
+from discord import ButtonStyle
 
 class GameInteractions(commands.Cog):
    def __init__(self, bot):
@@ -43,6 +44,33 @@ class GameInteractions(commands.Cog):
 
       # 5) (Optional) send a private followup so the clicker knows it ran
       await interaction.followup.send(f"🔨 Issued `?gameban {user_id}`", ephemeral=True)
+
+      old_rows = interaction.message.components  # list of ActionRow
+      new_view = View()
+      
+      for row in old_rows:
+         for comp in row.components:
+            # if it’s our Ban button, disable it
+            if getattr(comp, "custom_id", "") == cid:
+               new_view.add_item(
+                  Button(
+                     style=ButtonStyle.primary,
+                     label=comp.label,
+                     custom_id=comp.custom_id,
+                     disabled=True
+                     )
+               )
+            elif comp.style == ButtonStyle.link:
+               new_view.add_item(
+                  Button(
+                     style=ButtonStyle.link,
+                     label=comp.label,
+                     url=comp.url,
+                     disabled=False
+                  )
+               )
+               
+      await interaction.message.edit(view=new_view)
                 
 async def setup(bot):
     await bot.add_cog(GameInteractions(bot))
