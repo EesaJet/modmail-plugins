@@ -18,6 +18,7 @@ class GameInteractions(commands.Cog):
          return
 
       user_id_str = cid[len("exp_"):-len("_gameban")]
+      print(user_id_str)
       if not user_id_str.isdigit():
          return
       user_id = int(user_id_str)
