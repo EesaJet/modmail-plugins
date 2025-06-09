@@ -658,7 +658,7 @@ class ModerationLogging:
             color=action_colors.get(action, action_colors["normal"]),
             timestamp=discord.utils.utcnow(),
         )
-        embed.description = f"**Message edited in {channel.mention}:**\n"
+        embed.description = f"Message edited in {channel.mention}:\n"
         footer_text = f"Message ID: {payload.message_id}\nChannel ID: {payload.channel_id}"
 
         info = None
