@@ -125,7 +125,7 @@ class Essentials(commands.Cog):
                     for key, (place_name, game_link) in location_map.items():
                         if key in combined:
                             await message.channel.send(
-                                f"📢 **Shift on {place_name}** announced by **{author_name}**\n\n"
+                                f"## 📢 Shift on {place_name} announced by {author_name}\n\n"
                                 f"{filtered_desc}\n\n"
                                 f"**Game Link: 🔗** {game_link}\n"
                                 "<@&1237844151525969930>"
@@ -137,18 +137,18 @@ class Essentials(commands.Cog):
                 for key, (_, game_link) in location_map.items():
                     if key in combined:
                         await message.channel.send(
-                            f"📢 **{embed_title}** posted by **{author_name}**\n\n"
+                            f"## 📢 {embed_title} posted by {author_name}\n\n"
                             f"{filtered_desc}\n\n"
                             f"**Game Link: 🔗** {game_link}\n"
-                            "<@&1237844151525969930>"
+                            "-# <@&1237844151525969930>"
                         )
                         await message.delete()        # ← delete the original embed message
                         return
                         
                 await message.channel.send(
-                    f"📢 **{embed_title}** posted by **{author_name}**\n\n"
+                    f"## 📢 {embed_title} posted by {author_name}\n\n"
                     f"{filtered_desc}\n\n"
-                    "<@&1237844151525969930>"
+                    "-# <@&1237844151525969930>"
                 )
                 await message.delete()        # ← delete the original embed message
                 return
