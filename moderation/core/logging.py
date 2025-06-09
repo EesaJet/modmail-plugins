@@ -668,7 +668,7 @@ class ModerationLogging:
                 return
 
             embed.add_field(
-                name="Before", value=truncate(old_message.content, Limit.embed_field_value) or "No Content"
+                name="Before", value=truncate(old_message.content, Limit.embed_field_value) or "No Content", inline=False
             )
             info = (
                 f"Sent by: {old_message.author.mention}\n"
@@ -689,9 +689,9 @@ class ModerationLogging:
 
         message = await channel.fetch_message(message_id)
         target = message.author
-        embed.add_field(name="After", value=truncate(new_content, Limit.embed_field_value) or "No Content")
+        embed.add_field(name="After", value=truncate(new_content, Limit.embed_field_value) or "No Content", inline=False)
         if info is not None:
-            embed.add_field(name="Message info", value=info)
+            embed.add_field(name="Message info", value=info, inline=False)
         embed.set_footer(text=footer_text)
         embed.set_thumbnail(url=target.display_avatar.url)
 
@@ -700,6 +700,7 @@ class ModerationLogging:
             action=action,
             embed=embed,
         )
+        
     #logs for member joining server
     async def on_member_join(self, member: discord.Member) -> None:
 
