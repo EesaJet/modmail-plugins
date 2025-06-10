@@ -128,7 +128,7 @@ class Essentials(commands.Cog):
                                 f"## 📢 Shift on {place_name} announced by {author_name}\n\n"
                                 f"{filtered_desc}\n\n"
                                 f"**Game Link: 🔗** {game_link}\n"
-                                "<@&1237844151525969930>"
+                                "-# <@&1237844151525969930>"
                             )
                             await message.delete()        # ← delete the original embed message
                             return
