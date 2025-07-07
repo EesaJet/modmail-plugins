@@ -80,7 +80,7 @@ class LoAData(commands.Cog):
         cnt = await self.collection.count_documents({})
         await ctx.send(f"✅ There are currently **{cnt}** logged reactions.")
 
-    @tasks.loop(time=time(hour=0, minute=0, tzinfo=ZoneInfo("Europe/London")))
+    @tasks.loop(time=time(hour=14, minute=18, tzinfo=ZoneInfo("Europe/London")))
     async def _daily_loa_check(self):
         """
         Every midnight UK local time, scan all LOA entries:
