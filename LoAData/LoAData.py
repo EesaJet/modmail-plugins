@@ -131,7 +131,7 @@ class LoAData(commands.Cog):
         except Exception as exc:
             await self.report_error(f"Failed to count documents: {exc}")
 
-    @tasks.loop(time=time(hour=14, minute=33, tzinfo=ZoneInfo("Europe/London")))
+    @tasks.loop(time=time(hour=14, minute=38, tzinfo=ZoneInfo("Europe/London")))
     async def _daily_loa_check(self):
         today = datetime.now(self.tz).date()
         default_year = today.year
