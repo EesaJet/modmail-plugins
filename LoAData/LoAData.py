@@ -35,10 +35,7 @@ def parse_flexible_date(raw: str, default_year: int) -> datetime.date | None:
       - D Month [YYYY]
     Returns a date object or None if parsing fails.
     """
-    # strip ordinal suffixes
     cleaned = re.sub(r"(\d+)(st|nd|rd|th)", r"\1", raw, flags=re.IGNORECASE)
-
-    # numeric format
     m = re.search(r"(\d{1,2})/(\d{1,2})/(\d{2,4})", cleaned)
     if m:
         day, mon, yr = map(int, m.groups())
@@ -48,8 +45,6 @@ def parse_flexible_date(raw: str, default_year: int) -> datetime.date | None:
             return datetime(year=yr, month=mon, day=day).date()
         except ValueError:
             return None
-
-    # named-month format
     m = re.search(r"(\d{1,2})\s+([A-Za-z]+)(?:\s+(\d{2,4}))?", cleaned)
     if m:
         day = int(m.group(1))
@@ -65,10 +60,9 @@ def parse_flexible_date(raw: str, default_year: int) -> datetime.date | None:
             return datetime(year=yr, month=mon, day=day).date()
         except ValueError:
             return None
-
     return None
 
-# --- plugin metadata (required by your loader) ---
+# --- plugin metadata (required by loader) ---
 info_json = Path(__file__).parent.resolve() / "info.json"
 with open(info_json, encoding="utf-8") as f:
     __plugin_info__ = json.loads(f.read())
@@ -85,7 +79,7 @@ class LoAData(commands.Cog):
         self.bot = bot
         self.db = bot.api.get_plugin_partition(self)
         self.collection = self.db["reacted_messages"]
-        self._channel_id = 455404878202798100
+        self._channel_id = 455404878202798100  # also error reporting channel
         self._emoji = "✅"
         self.role_id = 570024555595169813
         self.tz = ZoneInfo("Europe/London")
@@ -93,6 +87,16 @@ class LoAData(commands.Cog):
 
     def cog_unload(self) -> None:
         self._daily_loa_check.cancel()
+
+    async def report_error(self, message: str) -> None:
+        """Send error message to the designated channel and log it."""
+        logger.error(message)
+        ch = self.bot.get_channel(self._channel_id)
+        if isinstance(ch, discord.TextChannel):
+            try:
+                await ch.send(f"⚠️ Error in LoAData: {message}")
+            except Exception as exc:
+                logger.error(f"Failed to report error to channel: {exc}")
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
@@ -104,8 +108,9 @@ class LoAData(commands.Cog):
         try:
             message = await channel.fetch_message(payload.message_id)
         except discord.NotFound:
-            logger.warning(f"Message {payload.message_id} not found for logging")
+            await self.report_error(f"Message {payload.message_id} not found for logging")
             return
+
         doc = {
             "message_id": message.id,
             "user_id": message.author.id,
@@ -114,39 +119,39 @@ class LoAData(commands.Cog):
         }
         try:
             await self.collection.insert_one(doc)
-            logger.info(f"Logged reaction on message {message.id} by {message.author.id}")
         except Exception as exc:
-            logger.error(f"Failed to log reaction: {exc}")
+            await self.report_error(f"Failed to log reaction: {exc}")
 
     @commands.command(name="reactionlog_count")
     @commands.has_permissions(administrator=True)
     async def _count(self, ctx: commands.Context):
-        cnt = await self.collection.count_documents({})
-        await ctx.send(f"✅ There are currently **{cnt}** logged reactions.")
+        try:
+            cnt = await self.collection.count_documents({})
+            await ctx.send(f"✅ There are currently **{cnt}** logged reactions.")
+        except Exception as exc:
+            await self.report_error(f"Failed to count documents: {exc}")
 
     @tasks.loop(time=time(hour=0, minute=0, tzinfo=ZoneInfo("Europe/London")))
     async def _daily_loa_check(self):
         today = datetime.now(self.tz).date()
         default_year = today.year
-
         channel = self.bot.get_channel(self._channel_id)
         if not isinstance(channel, discord.TextChannel):
             return
         guild = channel.guild
         role = guild.get_role(self.role_id)
         if role is None:
-            logger.error(f"LOA role {self.role_id} not found in guild {guild.id}")
+            await self.report_error(f"LOA role {self.role_id} not found in guild {guild.id}")
             return
 
         async for doc in self.collection.find({}):
             content = doc.get("content", "")
             user_id = doc.get("user_id")
-            if not content or not user_id:
+            if not (content and user_id):
                 continue
 
-            # extract raw date strings
             start_m = re.search(r"(?:Start Date|Date Start):\s*([^\n\r]+)", content, re.IGNORECASE)
-            end_m   = re.search(r"(?:Return Date|Date End|End Date):\s*([^\n\r]+)", content, re.IGNORECASE)
+            end_m = re.search(r"(?:Return Date|Date End|End Date):\s*([^\n\r]+)", content, re.IGNORECASE)
             if not (start_m and end_m):
                 continue
 
@@ -160,29 +165,42 @@ class LoAData(commands.Cog):
             except discord.NotFound:
                 continue
 
-            # start: assign role, store old nick, update nick
+            # start date actions
             if start_date == today:
                 if role not in member.roles:
-                    await member.add_roles(role, reason="LOA start date reached")
+                    try:
+                        await member.add_roles(role, reason="LOA start date reached")
+                    except Exception as exc:
+                        await self.report_error(f"Failed to add role to {member.id}: {exc}")
                 old_nick = member.nick
-                await self.collection.update_one({"_id": doc["_id"]}, {"$set": {"old_nick": old_nick}})
+                try:
+                    await self.collection.update_one({"_id": doc["_id"]}, {"$set": {"old_nick": old_nick}})
+                except Exception as exc:
+                    await self.report_error(f"Failed to store old nickname for {member.id}: {exc}")
                 current = member.nick or member.name
                 match = re.match(r"^(🔰)\s*\w+\s*\|\|\s*(.+)$", current)
                 new_nick = f"{match.group(1)} LoA || {match.group(2)}" if match else f"🔰 LoA || {current}"
                 try:
                     await member.edit(nick=new_nick, reason="LOA start nickname change")
                 except Exception as exc:
-                    logger.error(f"Failed to update nickname for {member.id}: {exc}")
-            # end: remove role, revert nick, delete entry
+                    await self.report_error(f"Failed to update nickname for {member.id}: {exc}")
+
+            # return date actions
             elif return_date == today:
                 if role in member.roles:
-                    await member.remove_roles(role, reason="LOA return date reached")
+                    try:
+                        await member.remove_roles(role, reason="LOA return date reached")
+                    except Exception as exc:
+                        await self.report_error(f"Failed to remove role from {member.id}: {exc}")
                 old_nick = doc.get("old_nick")
                 try:
                     await member.edit(nick=old_nick, reason="Revert LoA nickname")
                 except Exception as exc:
-                    logger.error(f"Failed to revert nickname for {member.id}: {exc}")
-                await self.collection.delete_one({"_id": doc["_id"]})
+                    await self.report_error(f"Failed to revert nickname for {member.id}: {exc}")
+                try:
+                    await self.collection.delete_one({"_id": doc["_id"]})
+                except Exception as exc:
+                    await self.report_error(f"Failed to delete LOA entry for {member.id}: {exc}")
 
     @_daily_loa_check.before_loop
     async def _before_daily_loa(self):
