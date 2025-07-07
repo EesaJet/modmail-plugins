@@ -1,1 +1,8 @@
-
+{
+  "name": "reaction_log",
+  "version": "1.0.0",
+  "description": [
+    "Logs messages reacted with ✅ in channel 455404878202798100",
+    "and stores them in MongoDB under `reacted_messages`."
+  ]
+}
